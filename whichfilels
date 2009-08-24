@@ -1,0 +1,39 @@
+#!/bin/bash
+#
+# This script will quickly check out a binary
+#
+# Copyright (c) 2009 Grant Bowman.
+# please send bugfixes or comments to grantbow@grantbow.com
+#
+# Author:  Grant Bowman       <grantbow@grantbow.com>
+#
+
+OUTPUT=`which $*`
+echo `file $OUTPUT`
+echo `ls -l $OUTPUT`
+if [[ -L $OUTPUT ]]; then {
+    echo " -> LINK";
+    ONE=`readlink $OUTPUT`;
+    if [[ ! -a $ONE ]]; then
+        ONE=`readlink -f $OUTPUT`; # correction for relative symbolic link
+    fi
+    echo -n "    "
+    echo `file $ONE`;
+    echo -n "    "
+    echo `ls -l $ONE`;
+    if [[ -L $ONE ]]; then {
+        echo " -> LINK -> LINK";
+        TWO=`readlink -f $One`;
+        if [[ ! -a $TWO ]]; then # correction for relative symbolic link
+            TWO=`readlink -f $ONE`;
+        fi
+        echo -n "            "
+        echo `file $TWO`;
+        echo -n "            "
+        echo `ls -l $TWO`;
+    }
+    fi
+}
+fi
+exit 0
+

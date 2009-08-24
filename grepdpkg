@@ -1,0 +1,20 @@
+#!/bin/bash
+
+# auto-update data if more than one day old
+if [ -z "`find $HOME/bin -mtime -1 -name dpkgl.txt -print`" ] ; then 
+ 	dpkg -l > $HOME/bin/dpkgl.txt 
+fi
+
+
+echo
+echo "egrep -i $* $HOME/bin/dpkgl.txt"
+echo "dpkgl.txt `ls -l $HOME/bin/dpkgl.txt`"
+echo
+egrep -i "$*" $HOME/bin/dpkgl.txt
+echo
+
+#       ##########
+#       ##########       future idea
+#       ########## use this to diff from the old one!!!
+#       ##########
+                           

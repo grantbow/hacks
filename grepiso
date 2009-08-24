@@ -1,0 +1,56 @@
+#!/bin/bash
+echo
+echo "text from Debian package iso-codes"
+echo "egrep -i -h $* /usr/share/iso-codes/iso_3166.tab"
+echo
+egrep -i -h "$*" /usr/share/iso-codes/iso_3166.tab
+echo
+
+# changed from these 20040808
+#echo "egrep -i -h $* /usr/share/iso-codes/iso_3166_1.tab /usr/share/iso-codes/iso_3166_3.tab"
+#egrep -i -h "$*" /usr/share/iso-codes/iso_3166_1.tab /usr/share/iso-codes/iso_3166_3.tab
+
+# > dateiso
+#2004-08-08T12:35-0700
+# > dpkg -L iso-codes | egrep -v locale
+#/.
+#/usr
+#/usr/share
+#/usr/share/iso-codes
+#/usr/share/iso-codes/iso_3166.tab
+#/usr/share/iso-codes/iso_639.tab
+#/usr/share/xml
+#/usr/share/xml/iso-codes
+#/usr/share/xml/iso-codes/iso_3166.xml
+#/usr/share/xml/iso-codes/iso_3166_2.xml
+#/usr/share/xml/iso-codes/iso_639.xml
+#/usr/share/xml/iso-codes/iso_4217.xml
+#/usr/share/doc
+#/usr/share/doc/iso-codes
+#/usr/share/doc/iso-codes/TODO
+#/usr/share/doc/iso-codes/README
+#/usr/share/doc/iso-codes/copyright
+#/usr/share/doc/iso-codes/changelog.gz
+#/usr/share/doc/iso-codes/changelog.Debian.gz
+#/usr/lib
+#/usr/lib/pkgconfig
+#/usr/lib/pkgconfig/iso-codes.pc
+
+
+# not needed - options for --update
+
+# Files in iso-codes as of 20040411
+#       /usr/share/iso-codes/iso_3166.tab
+#       /usr/share/iso-codes/iso_3166.xml
+#       /usr/share/iso-codes/iso_3166_1.tab
+#       /usr/share/iso-codes/iso_3166_2.tab
+#       /usr/share/iso-codes/iso_3166_2.xml
+#       /usr/share/iso-codes/iso_3166_3.tab
+#       /usr/share/iso-codes/iso_639.tab
+#       /usr/share/iso-codes/iso_639.xml
+#       /usr/share/iso-codes/iso_4217.tab
+#       /usr/share/iso-codes/iso_4217.xml
+#       /usr/share/iso-codes/iso_4217_historic.tab
+#
+# 	lynx -dump http://nl.ijs.si/gnusl/cee/std/ISO_3166.html > $HOME/bin/isocc.txt
+

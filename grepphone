@@ -1,0 +1,8 @@
+#!/bin/bash
+echo
+echo "zgrep -i $* /usr/share/misc/na.phone.gz"
+echo "zgrep -i $* /usr/share/misc/inter.phone.gz"
+echo
+zgrep -i $* /usr/share/misc/na.phone.gz
+zgrep -i $* /usr/share/misc/inter.phone.gz
+

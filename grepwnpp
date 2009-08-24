@@ -1,0 +1,31 @@
+#!/bin/bash
+echo
+echo "egrep -i $* $HOME/bin/wnppdump.txt"
+echo "egrep ^\ NNN\.\  $HOME/bin/wnppdump.txt                       # to get bracketed URL NNN from output"
+echo "wnppdump.txt `ls -l $HOME/bin/wnppdump.txt`"
+echo 
+egrep -i "$*" $HOME/bin/wnppdump.txt
+echo
+
+# todo - options for --update
+
+# if not `find $HOME/bin -mtime 1 -name wnppdump.txt -print` then;
+#	wget -O - "http://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=wnpp" > $HOME/bin/wnppdump.html
+#       lynx -dump "http://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=wnpp" | sed -e :a -e '$!N;s/\(\n\ \ \ \ \ \ \ \)[^P]/ /;ta' -e 'P;D' > $HOME/bin/wnppdump.txt
+#
+#       ##########
+#       ########## use this to diff from the old one!!!
+#       ##########
+# fi
+
+# 22:37:10 3 grantbow@sarge:~/bin > grepwnpp wordinspect
+# egrep -i wordinspect /home/grantbow/bin/wnppdump.txt
+# -rw-r--r-- 1 grantbow grantbow 854073 2004-04-06 22:31 /home/grantbow/bin/wnppdump.txt
+#
+#      * [374]#206889: O: wordinspect -- GTK-based Dictionary Client
+#
+# 22:36:54 3 grantbow@sarge:~/bin > egrep -i \ 374\.\  /home/grantbow/bin/wnppdump.txt
+# 374. http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=206889
+#
+
+
