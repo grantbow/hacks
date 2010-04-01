@@ -1,0 +1,34 @@
+#!/bin/bash
+
+# script purge-old-kernels
+# script itten by: Grant Bowman <grantbow@ubuntu.com>
+# script Version 1.0
+# Licensed under the GPL v2 or greater
+
+# runs apt-get purge on old linux-image packages and their headers
+# This script could easily be modified for other systems
+# however it has only been tested on Ubuntu 9.10 Karmic Koala
+# Information about other systems would be most appreicated.
+
+kernels=`dpkg -l | egrep ^ii.*linux-image-2 | cut --fields=3 --d=" " | cut -b13-`
+anyprocessed=0
+
+if (( $EUID )) ; then
+    echo "Warning: not run with root privileges";
+fi
+
+for kernel in $kernels ; do
+    if [[ ( $kernel != `uname -r` ) && ( $kernel < `uname -r` ) ]] ; then
+        # don't offer to remove the currently running or newer  kernels
+        anyprocessed=1
+        echo -e " ***** Do you want to run the following command? [y/n] \n apt-get purge linux-image-$kernel linux-headers-$kernel linux-headers-`echo $kernel | egrep -o 2.6[0-9\.]*-[0-9]*` \n *****";
+        if [ `line` == "y" ] ; then
+            echo "apt-get purge linux-image-$kernel linux-headers-$kernel linux-headers-`echo $kernel | egrep -o 2.6[0-9\.]*-[0-9]*`";
+        fi
+    fi
+done
+
+if ! (( $anyprocessed )) ; then
+    echo "No old kernels found.";
+fi
+
