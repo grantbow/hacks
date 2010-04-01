@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# script ping-hourly-stats
+# script itten by: Grant Bowman <grantbow@ubuntu.com>
+# script Version 1.0
+# Licensed under the GPL v2 or greater
+
+# need to adjust output using cut, but char #s depend on data width.
+# I don't think columns or regex in this case would be fun.
+# cut -b 1-38,47-51,58-64,70-74,82-87,123-
+
+while true ; do
+    echo `date -d "next hour" +"%s"` `date -d "next hour" +"%Y-%m-%dT%T%z"` `ping -q -c 3600 192.168.100.1 | tail -2`
+done
+

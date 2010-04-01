@@ -1,0 +1,19 @@
+#!/bin/bash
+#
+# n       .note file starter and/or begin editing just like I want it
+#
+#         need to find and re-edit file that begins with date string with anything on the end
+#
+#echo "vim ~/.notes/`date +"%Y%m%d"`"
+cd $HOME/.notes
+DSTRING="`date +"%Y%m%d"`"
+if ! ( test -f $HOME/.notes/$DSTRING ) ; then
+        # use .vim/filetypes.vim instead of modelines
+        #vim $HOME/.notes/$DSTRING -c '+:r !tail -4 /home/grantbow/.notes/20040408' -c ':goto2' -c ':startinsert'
+        vim $HOME/.notes/$DSTRING -c 'exe "normal O"' -c 'exe "normal o"' -c ':startinsert' 
+else
+        # the viminfo feature of restarting the cursor location is great
+        vim $HOME/.notes/$DSTRING
+fi
+exit 0
+

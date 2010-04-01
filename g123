@@ -1,0 +1,18 @@
+#!/bin/bash
+#
+# Author:	Grant Bowman <grantbow@grantbow.com>
+#
+# Version:	@(#)1.0  20100327  grantbow@grantbow.com
+#
+
+for song in "$@"
+do
+    if [[ $song == *ogg ]]
+    then
+        ogg123 -q $song
+    elif [[ $song == *mp3 ]]
+    then
+        mpg123 -q $song
+    fi
+done
+
