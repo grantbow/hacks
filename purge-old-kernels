@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # script purge-old-kernels
-# script itten by: Grant Bowman <grantbow@ubuntu.com>
+# script written by: Grant Bowman <grantbow@ubuntu.com>
 # script Version 1.0
 # Licensed under the GPL v2 or greater
 
