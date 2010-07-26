@@ -18,6 +18,7 @@
 #          Gnumeric Spreadsheet can change epoch seconds to dates using =unix2date()
 #          OpenOffice.org Spreadsheet can import the data
 #          gnuplot use is possible
+#          rlplot looks possible but haven't used it yet
 #
 
 set -e
