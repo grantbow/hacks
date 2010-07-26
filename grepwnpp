@@ -18,13 +18,13 @@ echo
 #       ##########
 # fi
 
-# 22:37:10 3 grantbow@sarge:~/bin > grepwnpp wordinspect
-# egrep -i wordinspect /home/grantbow/bin/wnppdump.txt
-# -rw-r--r-- 1 grantbow grantbow 854073 2004-04-06 22:31 /home/grantbow/bin/wnppdump.txt
+# ~/bin $ grepwnpp wordinspect
+# egrep -i wordinspect ~/bin/wnppdump.txt
+# -rw-r--r-- 1 x x 854073 2004-04-06 22:31 ~/bin/wnppdump.txt
 #
 #      * [374]#206889: O: wordinspect -- GTK-based Dictionary Client
 #
-# 22:36:54 3 grantbow@sarge:~/bin > egrep -i \ 374\.\  /home/grantbow/bin/wnppdump.txt
+# ~/bin $ egrep -i \ 374\.\  ~/bin/wnppdump.txt
 # 374. http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=206889
 #
 
