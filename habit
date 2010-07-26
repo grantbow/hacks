@@ -14,6 +14,11 @@
 # Script Spec: commands are sourced and run for each event like .habit.event1
 #                       echo "event1!"
 #
+# Display: I don't know of software well adapted to making graphs of this data
+#          Gnumeric Spreadsheet can change epoch seconds to dates using =unix2date()
+#          OpenOffice.org Spreadsheet can import the data
+#          gnuplot use is possible
+#
 
 set -e
 
