@@ -7,19 +7,20 @@
 # Version:	@(#)goodmorning  1.2  2004-04-03  grantbow@grantbow.com
 #                   habitlog     2.0  2006-02-28  grantbow@grantbow.com
 #                   habit        3.0  2010-07-12  grantbow@grantbow.com
+#                   habit        3.1  2010-07-25  grantbow@grantbow.com
 #
 # Config Spec:  each line in habit.conf is an event name such as, no blank lines please
 #                       event1
-# Config Event Spec: commands are sourced and run for each event like .habit.event1
+# Script Spec: commands are sourced and run for each event like .habit.event1
 #                       echo "event1!"
 #
 
 set -e
 
 NAME="habit"
-DESC="script for keeping a record of events and triggering commands"
+DESC="script for keeping a record of events and running scripts"
 
-# originally a script for playing music to record bedtime and wakeup time
+# originally a script for playing music to record sleep and wakeup times
 
 # depends on $HOME
 LOG=$HOME/.$NAME.log
@@ -31,6 +32,8 @@ SECONDS=`date +%s`            # current
 
 # no --help yet
 
+# hot keys easy to implement outside the script with numeric or event name parameter
+
 if ! [ -e $LOG ]; then { # missing log
     touch $LOG ;
     echo -e "event\treadable date\tepoch seconds\tinterval hours" >> $LOG
@@ -39,19 +42,21 @@ if ! [ -e $LOG ]; then { # missing log
     LASTDATE="NEVER"
     #LASTDATE=`date -d "1970-01-01 UTC $LASTSECONDS seconds" `
     }
-else {                   # log exists
+else {                   # log exists, read last event
     LASTSECONDS=`tail -1 $LOG | cut -f 3`
     LASTEVENT=`tail -1 $LOG | cut -f 1`
-        # future, could check for last even of each type, or over a week or month
+        # future, could check for last event of each type, or over a week or month
         # read "some" event history
         # tail -(cycle length*4) | $LASTEVENT
-    if [[ $LASTSECONDS == "epoch seconds" ]]; then
+    if [[ $LASTSECONDS == "epoch seconds" ]]; then { # no data in the log yet
         LASTSECONDS=$SECONDS
         LASTEVENT="NONE"
-    LASTDATE="NEVER"
-    else
+        LASTDATE="NEVER"
+        }
+    else {
     #else # assume log not empty, LASTSECONDS and LASTEVENT are ok
         LASTDATE=`date -d "1970-01-01 UTC $LASTSECONDS seconds" `
+        }
     fi
     }
 fi
@@ -59,8 +64,9 @@ fi
 
 
 # Read a config file if it is present.
-if [ -r $CONFIGFILE ] ; then
-    readarray -t CYCLE < $CONFIGFILE
+if [ -r $CONFIGFILE ] ; then {
+    readarray -t CYCLE < $CONFIGFILE # a bash builtin, CYCLE is an indexed array
+    }
 else {
     # elegant way to declare CYCLE and write the file
     CYCLE=(morning night)
@@ -99,54 +105,73 @@ fi
 #
 
 MENUCONTENT=
-INITSELECTION="1" #initial value
-Y=${#CYCLE[*]}
+INITSELECTION="1" # pre-highlight item, default is first item
+Y=${#CYCLE[*]} # set because there's trouble evaluating directly in the for (())
 # change loop is omitted indexes won't cause problems
 # for each?
-for (( X=0 ; $X < $Y ; X++ )) ; do {    # menu content for iselect
-    Z=$(($X+1))
-    C=${CYCLE[X]}
+for (( X=0 ; $X < $Y ; X++ )) ; do {
+
+    C=${CYCLE[X]} # current event name
+    # construct menu content for iselect
+    Z=$(($X+1)) # +1 convert from zero index
     MENUCONTENT="$MENUCONTENT<s:$Z>$Z.$C "; # if " " instead of "." 2 params
 
-    #echo "$LASTEVENT"
-    #echo "${CYCLE[X]}"
-    # if matches, set menu default
-    if [[ $LASTEVENT = ${CYCLE[X]} ]] ; then
-        INITSELECTION=$(( $X + 2 )) # +1 for next value, +1 because 0 indexed
+    #echo "${CYCLE[X]}" # debug
+    #echo "$LASTEVENT" # debug
+
+    if [[ $LASTEVENT = ${CYCLE[X]} ]] ; then { # highlight the next event
+        INITSELECTION=$(( $X + 2 )) # +1 next value, +1 convert from zero index
+        }
+    fi
+
+    if [[ $1 == $C || $1 == $Z ]] ; then {
+        MENURETURN="$Z" # valid parameter passed to script, no need for menu now
+        }
     fi
     }
 done
 
-# correction for starting from beginning
-if [[ $INITSELECTION -gt $Y ]] ; then
+# if INITSELECTION is too high, highlight first event
+if [[ $INITSELECTION -gt $Y ]] ; then {
     INITSELECTION="1"
+    }
+fi
+
+if [[ $1 && ! $MENURETURN ]] ; then {  # unrecognized script parameter
+    echo "unrecognized: $1"
+    exit 1
+}
 fi
 
 
-# present menu to user
+# present menu with configuration & previous event
 #echo $INITSELECTION
 #sleep 10
-Z=$(( ${#CYCLE[*]} + 1 ))
-MENURETURN="`iselect $MENUCONTENT \"\" \"<s:$Z>$(($Z)).configuration\" \"\" \"\" \"Previous event - $LASTEVENT $LASTDATE\" -p $INITSELECTION -n \"\" -kj:KEY_DOWN -kk:KEY_UP -kh:KEY_LEFT -kl:KEY_RIGHT -t \"$NAME testing version\"`"
+Z=$(( ${#CYCLE[*]} + 1 )) # configuration selection
+if [[ ! $MENURETURN ]] ; then {
+    MENURETURN="`iselect $MENUCONTENT \"\" \"<s:$Z>$(($Z)).configuration\" \"\" \"\" \"Previous event - $LASTEVENT $LASTDATE\" -p $INITSELECTION -n \"\" -kj:KEY_DOWN -kk:KEY_UP -kh:KEY_LEFT -kl:KEY_RIGHT -kSPACE:RETURN -t \"$NAME testing version\"`"
+    }
+fi
 #"<s:1>1 morning" "        song1" "        song2" "        {email assistant}" "<s:a1>        Add Trigger" "<s:2>2 evening" "        song3" "        song4" "        sing5" "<s:a2>        Add Trigger" "" "" "Previous event - `date -d "1970-01-01 UTC 1132835026 seconds"`" -Q "1" -n "" -t "lullibuy (alpha)"
 
 # write a message to STDOUT after each run
 echo -e "\tCheck out http://activehabits.com"
 
-SELECTINDEX=$MENURETURN-1 # correction for 0 based array
-#print $SELECTINDEX
+SELECTINDEX=$MENURETURN-1 # back to 0 based array
+#print $SELECTINDEX #debug
 
-if [[ $MENURETURN == $Z ]] ; then {            # configuration
+if [[ $MENURETURN == $Z ]] ; then {            # configuration selected
     echo -e "Configuration files are $CONFIGFILE\nData is found at        $LOG"
     echo -e "To run commands when events are triggered put the commands in:\n"
     # there must be a more elegant way to do this
-    for (( X=0 ; $X < $Y ; X++ )) ; do
+    for (( X=0 ; $X < $Y ; X++ )) ; do {
         A="$HOME/.$NAME.${CYCLE[X]}"
         if [ -f $A ] ; then
             printf '                %s\n' "$A (exists)"
         else
             printf '                %s\n' "$A"
         fi
+        }
     done
 
     }
@@ -170,13 +195,13 @@ elif [[ $SELECTINDEX -le ${#CYCLE} ]] ; then {
         #
         # 	date -d '1970-01-01 UTC 946684800 seconds' +"%Y-%m-%d T %T %z"
 
-    ##### execute event commands from $TRIGGERFILE
+    ##### source (execute) commands from $TRIGGERFILE
     TRIGGERFILE=$HOME/.$NAME.${CYCLE[SELECTINDEX]}
     if [ -r $TRIGGERFILE ] ; then
         . $TRIGGERFILE
     fi
     }
-else {
+else { # iselect shouldn't allow this
     echo -e "Nothing recorded to .$NAME.log."
     }
 fi
