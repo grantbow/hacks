@@ -1,15 +1,20 @@
 #!/bin/bash
 
 # script ping-hourly-stats
-# script itten by: Grant Bowman <grantbow@ubuntu.com>
+# script written by: Grant Bowman <grantbow@ubuntu.com>
 # script Version 1.0
 # Licensed under the GPL v2 or greater
 
 # need to adjust output using cut, but char #s depend on data width.
 # I don't think columns or regex in this case would be fun.
 # cut -b 1-38,47-51,58-64,70-74,82-87,123-
+# damn, tougher than expected.
+# I think I am 6 characters off, three each for the packet counts
+# 1270152340 2010-04-01T13:05:40-0700 3600 packets transmitted, 3595 received, 0% packet loss, time 36 05708ms rtt min/avg/max/mdev = 1.557/1.968/17.412/0.989 ms
+#
 
 while true ; do
     echo `date -d "next hour" +"%s"` `date -d "next hour" +"%Y-%m-%dT%T%z"` `ping -q -c 3600 192.168.100.1 | tail -2`
+#    echo `date -d "next hour" +"%s"` `date -d "next hour" +"%Y-%m-%dT%T%z"` `ping -q -c 3600 192.168.100.1 | tail -2 | cut -b 1-41,50-54,61-70,76-80,88-93,132-`
 done
 
