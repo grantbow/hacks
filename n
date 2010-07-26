@@ -9,7 +9,7 @@ cd $HOME/.notes
 DSTRING="`date +"%Y%m%d"`"
 if ! ( test -f $HOME/.notes/$DSTRING ) ; then
         # use .vim/filetypes.vim instead of modelines
-        #vim $HOME/.notes/$DSTRING -c '+:r !tail -4 /home/grantbow/.notes/20040408' -c ':goto2' -c ':startinsert'
+        #vim $HOME/.notes/$DSTRING -c '+:r !tail -4 $HOME/.notes/20040408' -c ':goto2' -c ':startinsert'
         vim $HOME/.notes/$DSTRING -c 'exe "normal O"' -c 'exe "normal o"' -c ':startinsert' 
 else
         # the viminfo feature of restarting the cursor location is great
