@@ -16,9 +16,10 @@
 #
 # Display: I don't know of software well adapted to making graphs of this data
 #          Gnumeric Spreadsheet can change epoch seconds to dates using =unix2date()
-#          OpenOffice.org Spreadsheet can import the data
-#          gnuplot use is possible
-#          rlplot looks possible but haven't used it yet
+#           OpenOffice.org Calc can import the data
+#                       gnuplot use is possible
+#                        rlplot looks possible but haven't used it yet
+#                         xplot looks possible but haven't used it yet
 #
 
 set -e
@@ -42,14 +43,14 @@ SECONDS=`date +%s`            # current
 
 if ! [ -e $LOG ]; then { # missing log
     touch $LOG ;
-    echo -e "event\treadable date\tepoch seconds\tinterval hours" >> $LOG
+    echo -e "event\tepoch seconds\thour of day\tinterval hours\treadable date" >> $LOG
     LASTSECONDS=$SECONDS
     LASTEVENT="NONE"
-    LASTDATE="NEVER"
+    LASTDATE="NEVER" # only used for display of iselect
     #LASTDATE=`date -d "1970-01-01 UTC $LASTSECONDS seconds" `
     }
 else {                   # log exists, read last event
-    LASTSECONDS=`tail -1 $LOG | cut -f 3`
+    LASTSECONDS=`tail -1 $LOG | cut -f 2`
     LASTEVENT=`tail -1 $LOG | cut -f 1`
         # future, could check for last event of each type, or over a week or month
         # read "some" event history
@@ -59,8 +60,7 @@ else {                   # log exists, read last event
         LASTEVENT="NONE"
         LASTDATE="NEVER"
         }
-    else {
-    #else # assume log not empty, LASTSECONDS and LASTEVENT are ok
+    else { # assume log not empty, LASTSECONDS and LASTEVENT are ok
         LASTDATE=`date -d "1970-01-01 UTC $LASTSECONDS seconds" `
         }
     fi
@@ -183,10 +183,13 @@ if [[ $MENURETURN == $Z ]] ; then {            # configuration selected
     }
 elif [[ $SELECTINDEX -le ${#CYCLE} ]] ; then {
     # log the event
+    MYHOUR=`date +%k`
+    XMIN=`date +%M`
+    MYMIN=`dc -e " 2 k $XMIN 60 / n "`
     if [[ $LASTSECONDS == $SECONDS ]] ; then
-        echo -e "${CYCLE[SELECTINDEX]}\t`date`\t$SECONDS\t$SECONDS" >> $LOG
+        echo -e "${CYCLE[SELECTINDEX]}\t$SECONDS\t$MYHOUR$MYMIN\t0.0\t`date`" >> $LOG
     else
-        echo -e "${CYCLE[SELECTINDEX]}\t`date`\t$SECONDS\t`dc -e \" 2 k $SECONDS $LASTSECONDS - 3600 / n\"`" >> $LOG
+        echo -e "${CYCLE[SELECTINDEX]}\t$SECONDS\t$MYHOUR$MYMIN\t`dc -e \" 2 k $SECONDS $LASTSECONDS - 3600 / n\"`\t`date`" >> $LOG
     fi
 
         # use dc to give the difference between two second values (replace variables):
@@ -200,6 +203,11 @@ elif [[ $SELECTINDEX -le ${#CYCLE} ]] ; then {
         # use this to convert epoch seconds back using local time zone (replace 946684800):
         #
         # 	date -d '1970-01-01 UTC 946684800 seconds' +"%Y-%m-%d T %T %z"
+        #
+        # use this to create an hour of day value
+        #
+        #       dc -e " 2 k `date +\"%M\"` 60 / n "
+        #
 
     ##### source (execute) commands from $TRIGGERFILE
     TRIGGERFILE=$HOME/.$NAME.${CYCLE[SELECTINDEX]}
