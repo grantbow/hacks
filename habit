@@ -8,6 +8,9 @@
 #                   habitlog     2.0  2006-02-28  grantbow@grantbow.com
 #                   habit        3.0  2010-07-12  grantbow@grantbow.com
 #                   habit        3.1  2010-07-25  grantbow@grantbow.com
+#                   habit        3.2  2010-07-31  grantbow@grantbow.com
+#
+# Package Dependencies: iselect gnuplot
 #
 # Config Spec:  each line in habit.conf is an event name such as, no blank lines please
 #                       event1
@@ -17,9 +20,10 @@
 # Display: I don't know of software well adapted to making graphs of this data
 #          Gnumeric Spreadsheet can change epoch seconds to dates using =unix2date()
 #           OpenOffice.org Calc can import the data
-#                       gnuplot use is possible
-#                        rlplot looks possible but haven't used it yet
-#                         xplot looks possible but haven't used it yet
+#                          xfig use is possible
+#                   ImageMagick use is possible
+#                        rlplot looks possible but have not tried yet
+#                         xplot looks possible but have not tried yet
 #
 
 set -e
@@ -29,13 +33,15 @@ DESC="script for keeping a record of events and running scripts"
 
 # originally a script for playing music to record sleep and wakeup times
 
+
 # depends on $HOME
 LOG=$HOME/.$NAME.log
 CONFIGFILE=$HOME/.$NAME.conf
+CHARTFILE=$HOME/.$NAME.png
 SECONDS=`date +%s`            # current
 #PIDFILE=/var/run/$NAME.pid   # not used yet
 
-########### * assumes * existence of tail, cut, dc, date & iselect
+########### * assumes * existence of tail, cut, dc, date
 
 # no --help yet
 
@@ -43,7 +49,7 @@ SECONDS=`date +%s`            # current
 
 if ! [ -e $LOG ]; then { # missing log
     touch $LOG ;
-    echo -e "event\tepoch seconds\thour of day\tinterval hours\treadable date" >> $LOG
+    echo -e "#event\tepoch seconds\thour of day\tinterval hours\treadable date" >> $LOG
     LASTSECONDS=$SECONDS
     LASTEVENT="NONE"
     LASTDATE="NEVER" # only used for display of iselect
@@ -99,22 +105,19 @@ fi
 #echo -n "$CURRENTPROCESSPID" > $PIDFILE
 #
 # catched skipped events in the cycle
-#prompt for missed time value for sleep events
+#prompt for missed time value for repeating events
 #
 # graphical summaries
 #option --week to give some kind of search results on the data collectect for the past week
 #maybe  --month as well.  Ideally a graph output
 #
-# localizable
-#
-# skinable
+# localize strings?
 #
 
 MENUCONTENT=
 INITSELECTION="1" # pre-highlight item, default is first item
 Y=${#CYCLE[*]} # set because there's trouble evaluating directly in the for (())
-# change loop is omitted indexes won't cause problems
-# for each?
+# when change loop is omitted indexes won't cause problems # for each?
 for (( X=0 ; $X < $Y ; X++ )) ; do {
 
     C=${CYCLE[X]} # current event name
@@ -126,11 +129,11 @@ for (( X=0 ; $X < $Y ; X++ )) ; do {
     #echo "$LASTEVENT" # debug
 
     if [[ $LASTEVENT = ${CYCLE[X]} ]] ; then { # highlight the next event
-        INITSELECTION=$(( $X + 2 )) # +1 next value, +1 convert from zero index
+        INITSELECTION=$(( $Z + 1 )) # +1 next value
         }
     fi
 
-    if [[ $1 == $C || $1 == $Z ]] ; then {
+    if [[ $1 == $C || $1 == $Z ]] ; then { # check for numeric or named event
         MENURETURN="$Z" # valid parameter passed to script, no need for menu now
         }
     fi
@@ -143,19 +146,20 @@ if [[ $INITSELECTION -gt $Y ]] ; then {
     }
 fi
 
-if [[ $1 && ! $MENURETURN ]] ; then {  # unrecognized script parameter
+if [[ $1 && ! $MENURETURN ]] ; then {  # unrecognized value passed to script
     echo "unrecognized: $1"
     exit 1
 }
 fi
 
 
-# present menu with configuration & previous event
+# present menu with configuration, chart & previous event
 #echo $INITSELECTION
 #sleep 10
-Z=$(( ${#CYCLE[*]} + 1 )) # configuration selection
+Z=$(( ${#CYCLE[*]} + 1 )) # configuration menu item, Z+1 charts actions
 if [[ ! $MENURETURN ]] ; then {
-    MENURETURN="`iselect $MENUCONTENT \"\" \"<s:$Z>$(($Z)).configuration\" \"\" \"\" \"Previous event - $LASTEVENT $LASTDATE\" -p $INITSELECTION -n \"\" -kj:KEY_DOWN -kk:KEY_UP -kh:KEY_LEFT -kl:KEY_RIGHT -kSPACE:RETURN -t \"$NAME testing version\"`"
+    MENURETURN="`iselect $MENUCONTENT \"\" \"<s:$Z>$(($Z)).configuration\" \"<s:$Z+1>$(($Z+1)).chart actions\" \"\" \"\" \"Previous event - $LASTEVENT $LASTDATE\" -p $INITSELECTION -n \"\" -kj:KEY_DOWN -kk:KEY_UP -kl:KEY_RIGHT -kSPACE:RETURN -t \"$NAME testing version\"`"
+    # couldn't get ESC to map to q or KEY_LEFT - quite annoying
     }
 fi
 #"<s:1>1 morning" "        song1" "        song2" "        {email assistant}" "<s:a1>        Add Trigger" "<s:2>2 evening" "        song3" "        song4" "        sing5" "<s:a2>        Add Trigger" "" "" "Previous event - `date -d "1970-01-01 UTC 1132835026 seconds"`" -Q "1" -n "" -t "lullibuy (alpha)"
@@ -163,10 +167,10 @@ fi
 # write a message to STDOUT after each run
 echo -e "\tCheck out http://activehabits.com"
 
-SELECTINDEX=$MENURETURN-1 # back to 0 based array
-#print $SELECTINDEX #debug
+SELECTINDEX=$(($MENURETURN-1)) # back to 0 based array
+Z=$(( $Z - 1 )) # back to 0 based
 
-if [[ $MENURETURN == $Z ]] ; then {            # configuration selected
+if [[ $SELECTINDEX == $(($Z)) ]] ; then {            # configuration selected
     echo -e "Configuration files are $CONFIGFILE\nData is found at        $LOG"
     echo -e "To run commands when events are triggered put the commands in:\n"
     # there must be a more elegant way to do this
@@ -181,11 +185,43 @@ if [[ $MENURETURN == $Z ]] ; then {            # configuration selected
     done
 
     }
+elif [[ $SELECTINDEX == $(($Z+1)) ]] ; then { # chart actions
+    echo "gogogo"
+    gnuplot - << EOF
+set title 'Marked Actions'
+set grid
+set border 6
+set size ratio 0.5
+unset key
+set x2data time
+set timefmt "%s"
+set format x2 "%a, %b %d"
+set x2tics 86400
+unset x2mtics
+unset xlabel
+unset xdata
+unset xtics
+unset mxtics
+set ylabel 'hour of day'
+set yrange [24:0]
+set ytics (0,6,12,18,24)
+set pointsize 4
+plot "$LOG" using 2:3 axis x1y1 with points 11
+pause 5 "saving copy of chart to $CHARTFILE"
+set terminal png
+set output "$CHARTFILE"
+replot
+EOF
+
+}
 elif [[ $SELECTINDEX -le ${#CYCLE} ]] ; then {
     # log the event
     MYHOUR=`date +%k`
     XMIN=`date +%M`
     MYMIN=`dc -e " 2 k $XMIN 60 / n "`
+    if [[ $MYMIN == 0 ]] ; then
+        MYMIN = ".0" # correction for possible dc output
+    fi
     if [[ $LASTSECONDS == $SECONDS ]] ; then
         echo -e "${CYCLE[SELECTINDEX]}\t$SECONDS\t$MYHOUR$MYMIN\t0.0\t`date`" >> $LOG
     else
@@ -202,7 +238,7 @@ elif [[ $SELECTINDEX -le ${#CYCLE} ]] ; then {
         #
         # use this to convert epoch seconds back using local time zone (replace 946684800):
         #
-        # 	date -d '1970-01-01 UTC 946684800 seconds' +"%Y-%m-%d T %T %z"
+        # 	date -d '1970-01-01 UTC 946684800 seconds' +"%Y-%m-%d T %T%z"
         #
         # use this to create an hour of day value
         #
