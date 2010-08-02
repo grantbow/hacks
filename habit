@@ -42,6 +42,11 @@ SECONDS=`date +%s`            # current
 #PIDFILE=/var/run/$NAME.pid   # not used yet
 
 ########### * assumes * existence of tail, cut, dc, date
+if ! [[ -x `which iselect` ]] ; then {
+    echo "Please install iselect.";
+    exit 1;
+}
+fi
 
 # no --help yet
 
@@ -158,35 +163,46 @@ fi
 #sleep 10
 Z=$(( ${#CYCLE[*]} + 1 )) # configuration menu item, Z+1 charts actions
 if [[ ! $MENURETURN ]] ; then {
-    MENURETURN="`iselect $MENUCONTENT \"\" \"<s:$Z>$(($Z)).configuration\" \"<s:$Z+1>$(($Z+1)).chart actions\" \"\" \"\" \"Previous event - $LASTEVENT $LASTDATE\" -p $INITSELECTION -n \"\" -kj:KEY_DOWN -kk:KEY_UP -kl:KEY_RIGHT -kSPACE:RETURN -t \"$NAME testing version\"`"
+    MENURETURN="`iselect $MENUCONTENT \"\" \"<s:$Z>$(($Z)).configuration\" \"<s:$Z+1>$(($Z+1)).chart actions\" \"<s:$Z+2>$(($Z+2)).cancel\" \"\" \"\" \"Previous event - $LASTEVENT $LASTDATE\" -p $INITSELECTION -n \"\" -kj:KEY_DOWN -kk:KEY_UP -kl:KEY_RIGHT -kSPACE:RETURN -t \"$NAME testing version\"`"
     # couldn't get ESC to map to q or KEY_LEFT - quite annoying
     }
 fi
 #"<s:1>1 morning" "        song1" "        song2" "        {email assistant}" "<s:a1>        Add Trigger" "<s:2>2 evening" "        song3" "        song4" "        sing5" "<s:a2>        Add Trigger" "" "" "Previous event - `date -d "1970-01-01 UTC 1132835026 seconds"`" -Q "1" -n "" -t "lullibuy (alpha)"
 
 # write a message to STDOUT after each run
-echo -e "\tCheck out http://activehabits.com"
+#echo -e "\tCheck out http://activehabits.com"
 
 SELECTINDEX=$(($MENURETURN-1)) # back to 0 based array
 Z=$(( $Z - 1 )) # back to 0 based
 
 if [[ $SELECTINDEX == $(($Z)) ]] ; then {            # configuration selected
-    echo -e "Configuration files are $CONFIGFILE\nData is found at        $LOG"
-    echo -e "To run commands when events are triggered put the commands in:\n"
+    echo -e "\nActions are in:       $CONFIGFILE (exists)\n"
+    echo -e "Marked actions:       $LOG (exists)\n"
+    if [ -f $CHARTFILE ] ; then
+        echo -e "Marked action chart:  $CHARTFILE (exists)\n"
+    else
+        echo -e "Marked action chart:  run $NAME and select chart actions\n"
+    fi
+    echo -e "\nTo run action commands put them in:\n"
     # there must be a more elegant way to do this
     for (( X=0 ; $X < $Y ; X++ )) ; do {
         A="$HOME/.$NAME.${CYCLE[X]}"
         if [ -f $A ] ; then
-            printf '                %s\n' "$A (exists)"
+            printf '                      %s\n' "$A (exists)"
         else
-            printf '                %s\n' "$A"
+            printf '                      %s\n' "$A"
         fi
         }
     done
+    echo -e
 
     }
 elif [[ $SELECTINDEX == $(($Z+1)) ]] ; then { # chart actions
-    echo "gogogo"
+    if ! [[ -x `which gnuplot` ]] ; then {
+        echo "Please install gnuplot.";
+        exit 1;
+    }
+    fi
     gnuplot - << EOF
 set title 'Marked Actions'
 set grid
