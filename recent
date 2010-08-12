@@ -1,0 +1,150 @@
+#!/bin/bash
+#
+# /usr/bin/recent
+#
+# This script will sort a recent long file list 
+#	defaults to listing the most recent 3 days, sorted by time
+#
+# Copyright (c) 2001 Grant Bowman.
+# please send bugfixes or comments to grant@suse.com.
+#
+# Author:  Grant Bowman       <grant@suse.com>
+#
+# Description:
+#       recent  [ -t | -s | -n ] [ -d | -o | -m [ # ] ] [FILE]
+#       -t           sort by time of files (default)
+#       -s           sort by size of files
+#       -n           sort by name of files
+#       -d [NUMBER]  measure recent days (default 3)
+#       -o [NUMBER]  measure recent hours
+#       -m [NUMBER]  measure recent minutes
+#       -h           display this help
+#
+# Todo: clean up specification of FILE
+ 
+#
+# Variables for use
+#
+: ${location='.'}  # location argument to pass to find 
+: ${recent=""}     # arguments to pass to find
+: ${num="3"}       # default numerial for unspecified measures {d,o,m}
+: ${sorting=""}    # arguments to pass to sort
+: ${optkey=""}
+
+#
+# Global variables used
+#
+: ${OPTARG=""}
+: ${OPTERR=0}
+trap "exit 1" 2 
+
+#
+# This loop will set up all the options passed to us 
+#
+while getopts ':snitm:o:d:h' optkey; do
+
+	case "$optkey" in
+	h) # print out command help
+		echo "Usage: recent [OPTION]... [NUMBER]... [DIR]"  1>&2
+		echo "List information about the files in the current directory."  1>&2
+		echo "Sort entries by time if none of -sn."  1>&2
+		echo "  -t                  sort by time of files (default)"  1>&2
+		echo "  -s                  sort by size of files"  1>&2
+		echo "  -n                  sort by name of files"  1>&2
+		echo "  -d [NUMBER]         measure recent days (default 3)"  1>&2
+		echo "  -o [NUMBER]         measure recent hours"  1>&2
+		echo "  -m [NUMBER]         measure recent minutes"  1>&2
+		echo "  [DIR]               directory" 1>&2
+		echo "  -h                  display this help"  1>&2
+		exit 0
+		;;
+    	t) # sort by time
+		sorting=" -k 6,7"
+        	continue
+		;;
+    	s) # sort by size
+		sorting=" -n -k 5"
+        	continue
+		;;
+    	n) # sort by name
+		sorting=" -d -k 8"
+        	continue
+		;;
+    	m) # find by minutes
+		#if test -n "$recent"; then
+		#	echo "Duplicate recent criteria - exiting"  1>&2
+		#	exit 1
+		#fi
+		recent=" -mmin -"
+		if (test -r "$OPTARG"); then
+			location="$OPTARG"
+		elif test $(($OPTARG)) -ne $(($num)) ; then
+			num="$OPTARG"
+		fi
+		continue
+		;;
+    	o) # find by hours
+		recent=" -mmin -"
+		if (test -r "$OPTARG"); then
+			location="$OPTARG"
+			num="$((num*60))"
+		elif (test $(($OPTARG)) -ne $(($num))) || (test $(($OPTARG)) -eq $(($num))) ; then
+			num="$(($OPTARG*60))"
+		fi
+		continue
+		;;
+    	d) # find by days
+		recent=" -daystart -mtime -"
+		if (test -r "$OPTARG"); then
+			location="$OPTARG"
+		elif test $(($OPTARG)) -ne $(($num)) ; then
+			num="$OPTARG"
+		fi
+		continue
+		;;
+	:) # measure specified without number
+		case "$OPTARG" in
+			m) recent=" -mmin -" ;;
+			o) recent=" -mmin -"; num="$((num*60))" ;;
+			d) recent=" -daystart -mtime -" ;;
+		esac
+		;;
+	?) # unspecified option given
+		echo "Invalid option -$OPTARG"  1>&2
+		;;
+	*) # Argument not processed correctly
+		echo "exiting - hit error: optkey $optkey recent $recent num $num OPTARG $OPTARG"  1>&2
+		exit 1
+		;;
+	esac
+
+done 
+
+if ! test -n "$recent"; then      # default select on # days time
+	recent=" -daystart -mtime -"
+fi
+
+if ! test -n "$sorting"; then     # default sort on time
+	sorting=" -k 6,7"
+fi
+
+####### echo  `find -path "$*" -maxdepth 0  -type f -exec echo '{}' ';' `
+#if (test -r "$*$OPTIND") ; then     # last parameter was a location
+	#echo  "$*$OPTIND"
+	#location="$OPTARG"
+#fi
+
+if (test $optkey == "?") &&  (test $OPTIND -eq $# ) ; then #(test -r "$1")  ; then  # special case - location only 
+	#location="$1"
+	location="$OPTARG"
+fi
+
+
+#	echo \"${@[$#i]}\"  #  $*$OPTIND
+
+#echo "optkey $optkey recent $recent num $num OPTARG $OPTARG OPTIND $OPTIND # $# * $*"  # debug echo
+#echo "$1" #debug echo
+
+echo find "$location -maxdepth 1 $recent$num -exec ls -ld '{}' ';' | sort $sorting" | bash --restricted --verbose -s --  1>&2
+exit 0
+
