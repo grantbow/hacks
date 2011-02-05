@@ -40,7 +40,7 @@ fi
 REPEATS=$1
 FILENAME=$2
 
-DEVICE=/dev/cdrw
+DEVICE=/dev/cdrw2
 # just in case, not exported
 LS_OPTIONS=''
 # get file size in bytes (5th column from ls -l output)
@@ -53,10 +53,10 @@ TARGETMD5=`egrep $FILENAME ubuntu-SHA256SUMS | cut -b -32`
 # currently script, MD5SUMS and images are all in the same directory
 
 for i in $(seq 1 $REPEATS); do
-	#eject -v
+	#eject -v $DEVICE
 	read -p "Place a blank CD in the open tray for writing #$i of $REPEATS
 	and press [Enter] to continue."
-	#eject -v -t	# -t: Close the CD tray
+	eject -v -t $DEVICE	# -t: Close the CD tray
 	sleep 15	# wait for spin up
 
 	# write the disc
@@ -70,8 +70,8 @@ for i in $(seq 1 $REPEATS); do
 	# Check the disc
 	# -----
 	#sleep 30	# Without this and the below sleep statements, we go on
-	eject -v	# before the CD drive is ready, and dd fails.
-	#eject -v -t	# This auto-remounts for reading.
+	eject -v $DEVICE # before the CD drive is ready, and dd fails.
+	#eject -v -t $DEVICE	# This auto-remounts for reading.
 	#sleep 30
 
 	#echo '***** TARGET sha256sum is' $TARGETMD5
@@ -84,4 +84,4 @@ for i in $(seq 1 $REPEATS); do
 	#beep		# the regular echo -e '\a' doesn't work for me for some reason
 			# beep is in package "beep".
 done
-eject -v   # open the tray for the last disc
+eject -v $DEVICE   # open the tray for the last disc
