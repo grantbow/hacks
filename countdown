@@ -1,0 +1,5 @@
+#!/bin/bash
+# courtesy of http://www.commandlinefu.com/commands/view/7938/countdown-clock
+MIN="$1";for ((i=MIN*60;i>=0;i--));do echo -ne "\r(`date -d\"0+$i sec\" +%H:%M:%S`)";sleep 1;done
+# alternative counting down seconds
+#MIN=1 && for i in $(seq $(($MIN*60)) -1 1); do echo -n "$i, "; sleep 1; done; echo -e "\n\nBOOOM! Time to start."
