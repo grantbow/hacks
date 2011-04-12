@@ -1,6 +1,7 @@
 #!/bin/bash
 #
 #   upt - show just the system uptime, days, hours, and minutes
+#   http://tldp.org/HOWTO/Bash-Prompt-HOWTO/x758.html
 
 upSeconds=`cat /proc/uptime | egrep -wo ^[0-9]* `
 secs=$(( ${upSeconds} % 60 ))
