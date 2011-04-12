@@ -1,0 +1,15 @@
+#!/bin/bash
+#
+#   upt - show just the system uptime, days, hours, and minutes
+
+upSeconds=`cat /proc/uptime | egrep -wo ^[0-9]* `
+secs=$(( ${upSeconds} % 60 ))
+mins=$(( ${upSeconds} / 60 % 60 ))
+hours=$(( ${upSeconds} / 3600 % 24 ))
+days=$(( ${upSeconds} / 86400 ))
+if [ "${days}" -ne "0" ]
+then
+   echo -n "${days}d"
+fi
+echo "${hours}h${mins}m"
+
