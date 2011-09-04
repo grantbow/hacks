@@ -40,7 +40,8 @@ fi
 REPEATS=$1
 FILENAME=$2
 
-DEVICE=/dev/cdrw2
+DEVICE=/dev/sr0
+#DEVICE=/dev/cdrw2
 # just in case, not exported
 LS_OPTIONS=''
 # get file size in bytes (5th column from ls -l output)

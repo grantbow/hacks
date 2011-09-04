@@ -2,7 +2,8 @@
 
 # script purge-old-kernels
 # script written by: Grant Bowman <grantbow@ubuntu.com>
-# script Version 1.0
+# script Version 1.1
+# copyright 2010
 # Licensed under the GPL v2 or greater
 
 # runs apt-get purge on old linux-image packages and their headers
@@ -14,15 +15,15 @@ kernels=`dpkg -l | egrep ^ii.*linux-image-2 | cut --fields=3 --d=" " | cut -b13-
 anyprocessed=0
 
 if (( $EUID )) ; then
-    echo "Warning: not run with root privileges";
+    echo "Warning: not run with root privileges. Kernels can not be purged. Rerun with \" sudo !!\"";
 fi
 
 for kernel in $kernels ; do
     if [[ ( $kernel != `uname -r` ) && ( $kernel < `uname -r` ) ]] ; then
         # don't offer to remove the currently running or newer  kernels
         anyprocessed=1
-        echo -e " ***** Do you want to run the following command? [y/n] \n apt-get purge linux-image-$kernel linux-headers-$kernel linux-headers-`echo $kernel | egrep -o 2.6[0-9\.]*-[0-9]*` \n *****";
-        if [ `line` == "y" ] ; then
+        echo -e " ***** Do you want to run the following command? [Y/n] \n apt-get purge linux-image-$kernel linux-headers-$kernel linux-headers-`echo $kernel | egrep -o 2.6[0-9\.]*-[0-9]*` \n *****";
+        if [ `line` == "y" ] || [ `line` == "" ] ; then
             echo "apt-get purge linux-image-$kernel linux-headers-$kernel linux-headers-`echo $kernel | egrep -o 2.6[0-9\.]*-[0-9]*`";
         fi
     fi
@@ -31,4 +32,9 @@ done
 if ! (( $anyprocessed )) ; then
     echo "No old kernels found.";
 fi
+
+
+# takes care of kernels? via comments from http://www.omgubuntu.co.uk/2011/07/kernel-entries-gone/
+#
+# dpkg -l 'linux-*' | sed '/^ii/!d;/'"$(uname -r | sed "s/\(.*\)-\([^0-9]\+\)/\1/")"'/d;s/^[^ ]* [^ ]* \([^ ]*\).*/\1/;/[0-9]/!d' | xargs sudo apt-get -y purge
 
