@@ -13,9 +13,10 @@ NAME="timeleft"
 DESC="Counting down an event"
 
 SECONDS=`date +%s`            # current
-LASTSECONDS=`date --date="Sept 6 06:00:00 PDT 2011" +%s`
+EVENT=`date --date="Sept 6 06:00:00 PDT 2011" +%s`
 
-echo "`dc -e \" 2 k $LASTSECONDS $SECONDS - 3600 / n \"` hours "
+#echo " $EVENT - $SECONDS = `dc -e \" 2 k $EVENT $SECONDS - n \"` seconds "
+echo "`dc -e \" 2 k $EVENT $SECONDS - 3600 / n \"` hours "
 
         # use dc to give the difference between two second values (replace variables):
         #
