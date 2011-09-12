@@ -1,0 +1,9 @@
+#!/bin/bash
+# stopdebugwifi: kills backgrounded iwevent used when debugging info for Wi-Fi
+#
+# Copyright (c) 2011 Grant Bowman http://grantbow.com/
+#
+# Version 0.1
+
+killall iwevent &
+

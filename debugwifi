@@ -1,0 +1,23 @@
+#!/bin/bash
+# debugwifi: run commands to display debugging info for Wi-Fi
+#
+#            requires stopdebugwifi because of backgrounded iwevent
+#
+# Copyright (c) 2011 Grant Bowman http://grantbow.com/
+#
+# Version 0.1
+
+# from BLFS
+NORMAL="\[\e[0m\]"
+RED="\[\e[1;31m\]"
+GREEN="\[\e[1;32m\]"
+BLUE="\[\e[1;34m\]"
+GREY="\[\e[1;30m\]"
+
+echo "$GREY***** running command$ $NORMAL iwconfig wlan3"
+iwconfig wlan3
+echo "$GREY***** running command$ $NORMAL iwevent &"
+iwevent &
+echo "$GREY***** running command$ $NORMAL tail --follow=name /var/log/syslog | egrep NetworkManager"
+tail --follow=name /var/log/syslog | egrep NetworkManager
+
