@@ -1,0 +1,8 @@
+#!/bin/bash
+#
+# hello             A first one line script to learn scripting
+# More information: http://grantbow.com/command_line.html
+#
+
+echo "Hello World"
+
