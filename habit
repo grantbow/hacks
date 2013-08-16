@@ -222,7 +222,7 @@ set ylabel 'hour of day'
 set yrange [24:0]
 set ytics (0,6,12,18,24)
 set pointsize 4
-plot "$LOG" using 2:3 axis x1y1 with points 11
+plot "$LOG" using 2:3 axis x1y1 with points
 pause 5 "saving copy of chart to $CHARTFILE"
 set terminal png
 set output "$CHARTFILE"

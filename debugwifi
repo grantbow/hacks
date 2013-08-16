@@ -7,6 +7,8 @@
 #
 # Version 0.1
 
+NETIF=wlan0
+
 # from BLFS
 NORMAL="\[\e[0m\]"
 RED="\[\e[1;31m\]"
@@ -14,8 +16,8 @@ GREEN="\[\e[1;32m\]"
 BLUE="\[\e[1;34m\]"
 GREY="\[\e[1;30m\]"
 
-echo "$GREY***** running command$ $NORMAL iwconfig wlan3"
-iwconfig wlan3
+echo "$GREY***** running command$ $NORMAL iwconfig $NETIF"
+iwconfig "$NETIF"
 echo "$GREY***** running command$ $NORMAL iwevent &"
 iwevent &
 echo "$GREY***** running command$ $NORMAL tail --follow=name /var/log/syslog | egrep NetworkManager"

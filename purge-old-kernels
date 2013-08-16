@@ -11,7 +11,7 @@
 # however it has only been tested on Ubuntu 9.10 Karmic Koala
 # Information about other systems would be most appreicated.
 
-kernels=`dpkg -l | egrep ^ii.*linux-image-2 | cut --fields=3 --d=" " | cut -b13-`
+kernels=`dpkg -l | egrep ^ii.*linux-image-\[23\] | cut --d=" " --fields=3 | cut --d="-" --fields=3-4`
 anyprocessed=0
 
 if (( $EUID )) ; then
@@ -19,12 +19,13 @@ if (( $EUID )) ; then
 fi
 
 for kernel in $kernels ; do
-    if [[ ( $kernel != `uname -r` ) && ( $kernel < `uname -r` ) ]] ; then
+    if [[ ( $kernel-generic != `uname -r` ) && ( $kernel-generic < `uname -r` ) ]] ; then
         # don't offer to remove the currently running or newer  kernels
         anyprocessed=1
-        echo -e " ***** Do you want to run the following command? [Y/n] \n apt-get purge linux-image-$kernel linux-headers-$kernel linux-headers-`echo $kernel | egrep -o 2.6[0-9\.]*-[0-9]*` \n *****";
-        if [ `line` == "y" ] || [ `line` == "" ] ; then
-            echo "apt-get purge linux-image-$kernel linux-headers-$kernel linux-headers-`echo $kernel | egrep -o 2.6[0-9\.]*-[0-9]*`";
+        echo -e " ***** Do you want to run the following command? [Y/n] \n apt-get purge linux-image-$kernel-generic linux-headers-$kernel linux-headers-$kernel-generic \n *****";
+        $L = `line`;
+        if [ $L == "y" ] || [ $L == "" ] ; then
+            echo "apt-get purge linux-image-$kernel-generic linux-headers-$kernel linux-headers-$kernel-generic";
         fi
     fi
 done

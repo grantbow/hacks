@@ -5,6 +5,8 @@
 #
 # Version 0.1
 
+NETIF=wlan0
+
 # from BLFS
 NORMAL="\[\e[0m\]"
 RED="\[\e[1;31m\]"
@@ -17,6 +19,6 @@ GREY="\[\e[1;30m\]"
 # -v verbose
 # only show packets arriving at or departing from this host
 
-echo "$GREY***** running command$ $NORMAL sudo tcpdump -l -n -v -i wlan3 host `hostname -I` "
-sudo tcpdump -l -n -v -i wlan3 host `hostname -I`
+echo "$GREY***** running command$ $NORMAL sudo tcpdump -l -n -v -i $NETIF host `hostname -I` "
+sudo tcpdump -l -n -v -i "$NETIF" host `hostname -I`
 
