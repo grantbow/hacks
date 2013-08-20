@@ -314,8 +314,7 @@ set grepprg=grep\ -E\ -i\ -n\ $*\ /dev/null " grep integration, see :he :make fo
      ""NeoBundleCheck
      "filetype plugin indent on     " required! - run via /etc/vim/vimrc on ubuntu by default
      "
-     "" undotree
-     
+     " undotree
 
      "" vundle config 
      "filetype off                   " required!

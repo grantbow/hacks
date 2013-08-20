@@ -1,0 +1,5 @@
+[user]
+	email = grantbow@ubuntu.com
+	name = Grant
+[core]
+	editor = vim
