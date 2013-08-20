@@ -136,3 +136,9 @@ PATH=$PATH:$HOME/.rvm/bin # Add RVM to PATH for scripting
 
 ### Added by the Heroku Toolbelt
 export PATH="/usr/local/heroku/bin:$PATH"
+
+# for Debian
+export DEBEMAIL="grantbow@svpal.org"
+export DEBFULLNAME="Grant Bowman"
+export PBUILDFOLDER=/var/cache/pbuilder
+

@@ -279,48 +279,48 @@ set grepprg=grep\ -E\ -i\ -n\ $*\ /dev/null " grep integration, see :he :make fo
 """"" 
 """""
 
-"  Neobundle, fork of vundle - plugin manager {{{2
+"  vundle - plugin manager {{{2
 """""
-""""" vim and git - sounds like a great system to me so I'll take a chance.
-""""" https://github.com/Shougo/neobundle.vim
+""""" vim and git - sounds like a great system to me so I'll take a chance on vundle.
 """""
-     " Use:
-     " :NeoBundleList          - list configured bundles
-     " :NeoBundleInstall(!)    - install(update) bundles
-     " :NeoBundleClean(!)      - confirm(or auto-approve) removal of unused bundles
-
-
-     filetype off
-     if has('vim_starting')
-        set runtimepath+=~/.vim/bundle/neobundle.vim/
-     endif
-
-     call neobundle#rc(expand('~/.vim/bundle/'))
-
-     " Let NeoBundle manage NeoBundle
-     NeoBundleFetch 'Shougo/neobundle.vim'
-     " for git
-     NeoBundle 'tpope/vim-fugitive'
-     " for PHP
-     NeoBundle 'spf13/PIV'
-     " visual undo tree
-     NeoBundle 'mbbill/undotree'
-     " debugging plugins like neobundle ;-)
-     NeoBundle 'bling/minivimrc'
-     " nerdtree
-     "NeoBundle 'scrooloose/nerdtree'
-
-     " Installation check.
-     "NeoBundleCheck
-     filetype plugin indent on     " required! - run via /etc/vim/vimrc on ubuntu by default
-
-     " undotree
+     "" https://github.com/Shougo/neobundle.vim
+     "" Use:
+     "" :NeoBundleList          - list configured bundles
+     "" :NeoBundleInstall(!)    - install(update) bundles
+     "" :NeoBundleClean(!)      - confirm(or auto-approve) removal of unused bundles
+     "
+     "
+     "filetype off
+     "if has('vim_starting')
+     "   set runtimepath+=~/.vim/bundle/neobundle.vim/
+     "endif
+     "
+     "call neobundle#rc(expand('~/.vim/bundle/'))
+     "
+     "" Let NeoBundle manage NeoBundle
+     "NeoBundleFetch 'Shougo/neobundle.vim'
+     "" for git
+     "NeoBundle 'tpope/vim-fugitive'
+     "" for PHP
+     "NeoBundle 'spf13/PIV'
+     "" visual undo tree
+     "NeoBundle 'mbbill/undotree'
+     "" debugging plugins like neobundle ;-)
+     "NeoBundle 'bling/minivimrc'
+     "" nerdtree
+     ""NeoBundle 'scrooloose/nerdtree'
+     "
+     "" Installation check.
+     ""NeoBundleCheck
+     "filetype plugin indent on     " required! - run via /etc/vim/vimrc on ubuntu by default
+     "
+     "" undotree
      
 
-     " previous vundle config 
+     "" vundle config 
      "filetype off                   " required!
      "set rtp+=~/.vim/bundle/vundle/
-     "call vundle#rc()
+     ""call vundle#rc()
      "" let Vundle manage Vundle
      "" required! 
      "Bundle 'gmarik/vundle'
@@ -328,7 +328,9 @@ set grepprg=grep\ -E\ -i\ -n\ $*\ /dev/null " grep integration, see :he :make fo
      "" My Bundles here:
      ""
      "" original repos on github
-     ""Bundle 'tpope/vim-fugitive'
+     "Bundle 'tpope/vim-fugitive'
+     "" for PHP
+     "Bundle 'spf13/PIV'
      ""Bundle 'Lokaltog/vim-easymotion'
      ""Bundle 'rstacruz/sparkup', {'rtp': 'vim/'}
      ""Bundle 'tpope/vim-rails.git'
@@ -340,6 +342,12 @@ set grepprg=grep\ -E\ -i\ -n\ $*\ /dev/null " grep integration, see :he :make fo
      "" git repos on your local machine (ie. when working on your own plugin)
      ""Bundle 'file:///Users/gmarik/path/to/plugin'
      "" ...
+     "" visual undo tree
+     "Bundle 'mbbill/undotree'
+     "" debugging plugins like vundle, neobundle ;-)
+     "Bundle 'bling/minivimrc'
+     "" nerdtree
+     ""NeoBundle 'scrooloose/nerdtree'
 
      "filetype plugin indent on     " required! - run via /etc/vim/vimrc on ubuntu by default
      ""
@@ -515,6 +523,7 @@ nmap <C-u> :undo<CR>
 """""
 
 "cabbrev man !info
+cabbrev wdiff w !diff -u % -
 cabbrev grepdpkg !grepdpkg
 cabbrev grepbook !grepbook
 cabbrev grepexcuses !grepexcuses

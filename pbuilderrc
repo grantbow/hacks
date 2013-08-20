@@ -1,6 +1,7 @@
 APTCACHEHARDLINK=no
 
-HOOKDIR="/var/cache/pbuilder/hook.d"
+HOOKDIR="/var/cache/pbuilder/hook.d/"
+AUTO_DEBSIGN=${AUTO_DEBSIGN:-yes}
 
 # ccache
 sudo mkdir -p /var/cache/pbuilder/ccache
