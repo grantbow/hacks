@@ -3,3 +3,5 @@
 	name = Grant
 [core]
 	editor = vim
+[push]
+	default = current
