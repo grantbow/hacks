@@ -524,6 +524,8 @@ nmap <C-u> :undo<CR>
 
 "cabbrev man !info
 cabbrev wdiff w !diff -u % -
+cabbrev Q! q!
+iabbrev :q! <esc>:q!
 cabbrev grepdpkg !grepdpkg
 cabbrev grepbook !grepbook
 cabbrev grepexcuses !grepexcuses
