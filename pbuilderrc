@@ -3,6 +3,24 @@ APTCACHEHARDLINK=no
 HOOKDIR="/var/cache/pbuilder/hook.d/"
 AUTO_DEBSIGN=${AUTO_DEBSIGN:-yes}
 
+# create images using these commands
+# sudo /usr/sbin/pbuilder create --debootstrapopts --variant=buildd --basetgz /var/cache/pbuilder/wheezy-amd64-base.tgz --distribution wheezy
+# update
+# sudo pbuilder --basetgz /var/cache/pbuilder/x-amd64-base.tgz --distribution x update
+# --override-config is important if changing COMPONENTS
+# setup /etc/fstab with this
+#tmpfs           /var/cache/pbuilder/build               tmpfs        defaults,size=2400M        0       0
+# make use of packages mini-dinstall and config .dput.cf
+# dput local foo*.changes
+# which puts them in /var/cache/archive/mini-dinstall/incoming
+
+# changes INSIDE *-base.tgz
+# echo "force-unsafe-io" > /etc/dpkg/dpkg.cfg.d/02apt-speedup
+#
+# # Innstall eatmydata in new chroots (will cause chroot creation failure for pre-maverick chroots)
+#EXTRAPACKAGES=eatmydata
+#export LD_PRELOAD="${LD_PRELOAD:+$LD_PRELOAD:}/usr/lib/libeatmydata/libeatmydata.so"
+
 # ccache
 #sudo mkdir -p /var/cache/pbuilder/ccache
 #sudo chmod a+w /var/cache/pbuilder/ccache
