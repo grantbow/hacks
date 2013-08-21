@@ -1,0 +1,22 @@
+#!/bin/bash
+
+# see http://www.debian.org/devel/wnpp/
+
+# auto-update data if more than one day old
+if [ -z "`find $HOME/bin -mtime -1 -name wnppalert.txt -print`" ] ; then 
+ 	wnpp-alert > $HOME/bin/wnppalert.txt 
+fi
+
+
+echo
+echo "egrep -i $* $HOME/bin/wnppalert.txt"
+echo "wnppalert.txt `ls -l $HOME/bin/wnppalert.txt`"
+echo
+egrep -i "$*" $HOME/bin/wnppalert.txt
+echo
+
+#       ##########
+#       ##########       future idea
+#       ########## use this to diff from the old one!!!
+#       ##########
+                           

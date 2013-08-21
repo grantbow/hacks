@@ -1,12 +1,35 @@
 #!/bin/bash
+
+# see http://www.debian.org/devel/wnpp/
+
+# auto-update data if more than one day old
+if [ -z "`find $HOME/bin -mtime -1 -name wnppdump.txt -print`" ] ; then 
+     lynx -dump "http://bugs.debian.org/cgi-bin/pkgreport.cgi?pkg=wnpp" | sed -e :a -e '$!N;s/\(\n\ \ \ \ \ \ \ \)[^P]/ /;ta' -e 'P;D' > $HOME/bin/wnppdump.txt
+fi
+
+
 echo
 echo "egrep -i $* $HOME/bin/wnppdump.txt"
-echo "egrep ^\ NNN\.\  $HOME/bin/wnppdump.txt                       # to get bracketed URL NNN from output"
 echo "wnppdump.txt `ls -l $HOME/bin/wnppdump.txt`"
-echo 
+echo
 egrep -i "$*" $HOME/bin/wnppdump.txt
 echo
 
+##!/bin/bash
+#echo
+#echo "egrep -i $* $HOME/bin/wnppdump.txt"
+#echo "egrep ^\ NNN\.\  $HOME/bin/wnppdump.txt                       # to get bracketed URL NNN from output"
+#echo "wnppdump.txt `ls -l $HOME/bin/wnppdump.txt`"
+#echo 
+#egrep -i "$*" $HOME/bin/wnppdump.txt
+#echo
+
+
+#       ##########
+#       ##########       future idea
+#       ########## use this to diff from the old one!!!
+#       ##########
+                           
 # todo - options for --update
 
 # if not `find $HOME/bin -mtime 1 -name wnppdump.txt -print` then;

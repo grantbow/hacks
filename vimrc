@@ -104,7 +104,7 @@ set scrolljump=1        " Minimal number of lines to scroll vertically
 " hlsearch, mouse, backspace, virtualedit {{{2
 """""
 set hlsearch            " highlight all search matches
-"dagobah set mouse=a
+set mouse=a
 set mousemodel=popup_setpos
 set backspace=indent,eol,start " allow backspacing over everything in insert mode
 set virtualedit=all     " don't require the cursor to move on real characters.

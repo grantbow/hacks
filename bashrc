@@ -134,7 +134,6 @@ export IRCNICK
 # for ruby gems 20130711
 export PATH=/var/lib/gems/1.8/bin:$PATH
 
-
 PATH=$PATH:$HOME/bin:$HOME/.rvm/bin # Add bin and RVM to PATH for scripting
 
 ### Added by the Heroku Toolbelt

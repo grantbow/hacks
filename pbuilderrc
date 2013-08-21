@@ -4,19 +4,20 @@ HOOKDIR="/var/cache/pbuilder/hook.d/"
 AUTO_DEBSIGN=${AUTO_DEBSIGN:-yes}
 
 # ccache
-sudo mkdir -p /var/cache/pbuilder/ccache
-sudo chmod a+w /var/cache/pbuilder/ccache
+#sudo mkdir -p /var/cache/pbuilder/ccache
+#sudo chmod a+w /var/cache/pbuilder/ccache
 export CCACHE_DIR="/var/cache/pbuilder/ccache"
 export PATH="/usr/lib/ccache:${PATH}"
 EXTRAPACKAGES=ccache
 BINDMOUNTS="${CCACHE_DIR}"
 
-COMPONENTS="main restricted universe multiverse"
+COMPONENTS="main contrib non-free"
+#COMPONENTS="main restricted universe multiverse"
 
-if [ "$DIST" == "squeeze" ]; then
-    echo "Using a Debian pbuilder environment because DIST is $DIST"
-    COMPONENTS="main contrib non-free"
-fi
+#if [ "$DIST" == "squeeze" ]; then
+#    echo "Using a Debian pbuilder environment because DIST is $DIST"
+#    COMPONENTS="main contrib non-free"
+#fi
 
 # Codenames for Debian suites according to their alias. Update these when
 # needed.
