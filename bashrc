@@ -147,3 +147,5 @@ export PBUILDFOLDER=/var/cache/pbuilder
 export VISUAL=/usr/bin/vi
 export EDITOR=/usr/bin/vi
 
+#%sudo ALL=(ALL) NOPASSWD: ALL
+
