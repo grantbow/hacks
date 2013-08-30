@@ -84,8 +84,8 @@ set fileencodings=latin1
 """""
 set nobackup            " by default, do not keep a backup file (see ~/.vim/filetype.vim)
 set modelines=5         " turn on modelines, the security risk isn't dire
-set undofile
-set undodir=/home/grantbow/.vim/undo/
+"set undofile
+"set undodir=/home/grantbow/.vim/undo/
 set hidden              " allow BUFFERS to stay open even when no longer needed
 
 " }}}2
