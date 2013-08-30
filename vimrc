@@ -27,7 +27,7 @@ endfor
 """""
 """""
 
-" nocompatible, globals {{{2
+" nocompatible, encoding, nowrap, line number {{{2
 """""
 """""
 """""
@@ -38,6 +38,9 @@ set nocompatible
 " set this so all is read correctly
 "set encoding=iso-8859-1
 set encoding=utf-8
+
+" set nowrap allows zH and zL scrolling left & right
+set nowrap
 
 " set line numbering
 set number
