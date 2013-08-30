@@ -5,6 +5,10 @@ AUTO_DEBSIGN=${AUTO_DEBSIGN:-yes}
 
 # create images using these commands
 # sudo /usr/sbin/pbuilder create --debootstrapopts --variant=buildd --basetgz /var/cache/pbuilder/wheezy-amd64-base.tgz --distribution wheezy
+#
+# pdebuild acts like debuild, a wrapper for pbuilder
+# pbuild is a python script written by canonical; not well documented
+#
 # update
 # sudo pbuilder --basetgz /var/cache/pbuilder/x-amd64-base.tgz --distribution x update
 # --override-config is important if changing COMPONENTS
@@ -13,8 +17,6 @@ AUTO_DEBSIGN=${AUTO_DEBSIGN:-yes}
 # make use of packages mini-dinstall and config .dput.cf
 # dput local foo*.changes
 # which puts them in /var/cache/archive/mini-dinstall/incoming
-#
-# pdebuild acts like debuild
 #
 # example
 #

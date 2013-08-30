@@ -147,5 +147,7 @@ export PBUILDFOLDER=/var/cache/pbuilder
 export VISUAL=/usr/bin/vi
 export EDITOR=/usr/bin/vi
 
+export XDG_CONFIG_HOME=$HOME/Projects
+
 #%sudo ALL=(ALL) NOPASSWD: ALL
 
