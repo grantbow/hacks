@@ -151,3 +151,8 @@ export XDG_CONFIG_HOME=$HOME/Projects
 
 #%sudo ALL=(ALL) NOPASSWD: ALL
 
+# lxde dclock settings in .config/lxpanel/LXDE/panels/panel
+# ClockFmt=%Y%m%d %a %R
+# TooltipFmt=%x %A
+# Action=xterm -r -geometry 67x37+956+231 -T cal -e "cal 2013;read -p Press.any.key... -n1 -s"
+
