@@ -575,18 +575,26 @@ endif
 set ttymouse=xterm2    " not auto-detected unless $TERM=xterm*, I use $TERM=screen
 
 " now more, let's use 16 colors instead of 8, see :he xfree-xterm
-if has("terminfo")
-    set t_Co=16
-    set t_AB=[%?%p1%{8}%<%t%p1%{40}%+%e%p1%{92}%+%;%dm
-    set t_AF=[%?%p1%{8}%<%t%p1%{30}%+%e%p1%{82}%+%;%dm
+"if has("terminfo")
+    "set t_Co=16
+    "set t_AB=[%?%p1%{8}%<%t%p1%{40}%+%e%p1%{92}%+%;%dm
+    "set t_AF=[%?%p1%{8}%<%t%p1%{30}%+%e%p1%{82}%+%;%dm
     " says perhaps 256 colors with :he
     "set t_AB=[48;5;%dm
     "set t_AF=[38;5;%dm
-else
-
-    set t_Co=16
+"else
+    "set t_Co=16
     "set t_Sf=[3%dm
     "set t_Sb=[4%dm
+"endif
+
+" http://askubuntu.com/questions/67/how-do-i-enable-full-color-support-in-terminal
+"  set t_Co=256
+
+if $TERM == 'xterm'
+    set t_Co=16
+    set t_AB=[%?%p1%{8}%<%t%p1%{40}%+%e%p1%{92}%+%;%dm
+    set t_AF=[%?%p1%{8}%<%t%p1%{30}%+%e%p1%{82}%+%;%dm
 endif
 
 "
@@ -597,13 +605,13 @@ let color="true"
 "
 if has("syntax")
     if color == "true"
-	" This will switch colors ON
+	  " This will switch colors ON
         syntax enable
-	" aka :so ${VIMRUNTIME}/syntax/syntax.vim
+	  " aka :so ${VIMRUNTIME}/syntax/syntax.vim
     else
-	" this switches colors OFF
-	set t_Co=0
-	syntax off
+	  " this switches colors OFF
+	  set t_Co=0
+	  syntax off
     endif
 endif
 
