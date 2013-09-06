@@ -592,13 +592,13 @@ set ttymouse=xterm2    " not auto-detected unless $TERM=xterm*, I use $TERM=scre
 "endif
 
 " http://askubuntu.com/questions/67/how-do-i-enable-full-color-support-in-terminal
-"  set t_Co=256
+"set t_Co=256
 
-if $TERM == 'xterm'
-    set t_Co=16
-    set t_AB=[%?%p1%{8}%<%t%p1%{40}%+%e%p1%{92}%+%;%dm
-    set t_AF=[%?%p1%{8}%<%t%p1%{30}%+%e%p1%{82}%+%;%dm
-endif
+"if $TERM == 'xterm'
+"    set t_Co=16
+"    set t_AB=[%?%p1%{8}%<%t%p1%{40}%+%e%p1%{92}%+%;%dm
+"    set t_AF=[%?%p1%{8}%<%t%p1%{30}%+%e%p1%{82}%+%;%dm
+"endif
 
 "
 " Colo(u)red or not colo(u)red
