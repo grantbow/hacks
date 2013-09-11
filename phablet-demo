@@ -1,0 +1,5 @@
+#!/bin/sh
+cat /sys/class/power_supply/battery/capacity
+dbus-send --system --print-reply --dest=org.freedesktop.Accounts /org/freedesktop/Accounts/User32011 org.freedesktop.DBus.Properties.Set string:com.canonical.unity.AccountsService string:demo-edges variant:boolean:true
+sudo -iu phablet /sbin/restart unity8
+
