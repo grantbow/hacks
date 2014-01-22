@@ -7,18 +7,18 @@
 
 " some good ideas are at http://blog.sanctum.geek.nz/vim-annoyances/
 
-" Section: disable arrow keys {{{1
+" Section: disabled disable arrow keys {{{1
 """""
 """""
 """""
 " given in #vim as
 " for mode in ['n','i','v'] | for key in ['up','down','left','right']|exec mode.'map <'.key.'> <nop>'|endfor|endfor
 "
-for mode in ['n','i','v']
-    for key in ['up','down','left','right']
-        exec mode.'map <'.key.'> <nop>'
-    endfor
-endfor
+"for mode in ['n','i','v']
+"    for key in ['up','down','left','right']
+"        exec mode.'map <'.key.'> <nop>'
+"    endfor
+"endfor
 
 " }}}1
 
