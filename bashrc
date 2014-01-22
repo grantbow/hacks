@@ -33,7 +33,7 @@ fi
 
 # set a fancy prompt (non-color, unless we know we "want" color)
 case "$TERM" in
-    xterm-color|screen) color_prompt=yes;;
+    xterm-256color|xterm-color|screen|screen-256color) color_prompt=yes;;
 esac
 
 # uncomment for a colored prompt, if the terminal has the capability; turned
@@ -128,7 +128,9 @@ if [ -f /etc/bash_completion ] && ! shopt -oq posix; then
     . /etc/bash_completion
 fi
 
-export IRCNICK
+export IRCNICK=dgdg
+export IRCNAME=grant
+export IRCSERVER=irc.oftc.net
 # fung1
 
 # for ruby gems 20130711

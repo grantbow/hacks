@@ -1,0 +1,7 @@
+Rxvt.reverseVideo: true
+Rxvt.font: fixed
+Rxvt.geometry: 140x40
+Rxvt.scrollBar_right: true
+Rxvt.highlightColor: yellow
+URxvt.font: xft:Mono:size=10
+
