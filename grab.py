@@ -1,8 +1,14 @@
 #!/usr/bin/python
 import argparse, urllib2, cookielib, Cookie, os, re
 from bs4 import BeautifulSoup
+from datetime import datetime
+
 parser = argparse.ArgumentParser()
-parser.add_argument("address", help="\"address\"")
+parser.add_argument("-o","--out",
+  help="output to file instead of stdout", type=argparse.FileType('w', 0))
+parser.add_argument("-i","--inter",
+  help="write intermediate downloaded files", action="store_true")
+parser.add_argument("address", help="\"required address\"")
 args = parser.parse_args()
 args.address = args.address.replace(' ','-')
 # url
@@ -10,7 +16,7 @@ url = 'http://www.zillow.com/homes/'+args.address+'_rb/'
 
 p = cookielib.DefaultCookiePolicy(rfc2965=True, strict_ns_domain=cookielib.DefaultCookiePolicy.DomainStrict,
     blocked_domains=[])
-cj = cookielib.MozillaCookieJar(os.path.join(os.path.expanduser("~"), "home-liberty.com", "cookiejar.txt"))
+cj = cookielib.MozillaCookieJar(os.path.join(os.path.expanduser("~"), "cookiejar.txt"))
 cj.load()
 
 b = cookielib.Cookie (version=0, name='F5P', value="1931528202.0.0000" , port=None, port_specified=False, domain='www.zillow.com', domain_specified=False, domain_initial_dot=False, path='/', path_specified=True, secure=False, expires=None, discard=True, comment=None, comment_url=None, rest={'HttpOnly': None}, rfc2109=False)
@@ -35,7 +41,14 @@ cj.set_cookie(j)
 opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
 r = opener.open(url)
 
-html=r.read()
+html = r.read()
+
+if args.inter:
+  now=datetime.today()
+  firstname = now.strftime("%Y%m%dT%I%M%S-1.html")
+  f = open(firstname,'w') 
+  f.write(html)
+  f.close()
 
 # got first page, find the zpid
 inewid = re.search("(zpid_)([0-9]+)", html)
@@ -50,11 +63,21 @@ if inewid:
   # close the cookie jar
   cj.save(ignore_expires=True, ignore_discard=True)
   
-  html=r.read()
+  html = r.read()
   
+  if args.inter:
+    secondname = now.strftime("%Y%m%dT%I%M%S-2.html")
+    f = open(secondname,'w') 
+    f.write(html)
+    f.close()
+
   soup=BeautifulSoup(html)
   
   table = soup.table
+
+  if args.out:
+    f = open(args.out.name,'w')
+
   for row in table.findAll('tr')[1:]:
     col = row.findAll('td')
     date = col[0].string
@@ -62,5 +85,10 @@ if inewid:
     amount = col[2].string
     desc = col[3].string
     record = (date, action, amount, desc)
-    print "\t".join(field or "" for field in record)
+    if args.out:
+      f.writelines("\t".join(field or "" for field in record)+'\n')
+    else:
+      print "\t".join(field or "" for field in record)
+  if args.out:
+    f.close()
   
