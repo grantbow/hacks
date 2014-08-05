@@ -1,22 +1,27 @@
 #!/bin/bash
 #
-# switchdocker         Script for changing DOCKER_HOST environment variable
+# cdocker         Script for changing DOCKER_HOST environment variable
+#
+#                 OOPS - no shell can change a parent's environment variable
+#                        so this must be moved to a function that exports
+#                        triggered when called/invoked by name
 #
 # Author:	Grant Bowman <grantbow@grantbow.com>
 #
 # Version:	
-#           switchdocker  0.1  2014-08-03  grantbow@grantbow.com
+#           cdocker  0.1  2014-08-03  grantbow@grantbow.com
+#           cdocker  0.2  2014-08-04  grantbow@grantbow.com - works but not a function yet
 #
 # Package Dependencies: iselect
 #
-# Config Spec:  each line in .switchdocker.conf is used for one DOCKER_HOST value
+# Config Spec:  each line in .cdocker.conf is used for one DOCKER_HOST value
 #                       tcp://127.0.0.1:2375
 #
 
 set -e
 
-NAME="switchdocker"
-DESC="script for changing between DOCKER_HOST values"
+NAME="cdocker"
+DESC="changes between DOCKER_HOST values"
 
 # depends on $HOME
 LOG=$HOME/.$NAME.log
@@ -37,7 +42,7 @@ fi
 
 if ! [ -e $LOG ]; then { # missing log
     touch $LOG ;
-    echo -e "DOCKER_HOST\tepoch seconds\thour of day\tinterval hours\treadable date" >> $LOG
+    echo -e "DOCKER_HOST\tepoch_seconds\thour_of_day\tinterval_hours\treadable_date" >> $LOG
     LASTSECONDS=$SECONDS
     LASTEVENT="NONE"
     LASTDATE="NEVER" # only used for display of iselect
@@ -46,7 +51,7 @@ if ! [ -e $LOG ]; then { # missing log
 else {                   # log exists, read last event
     LASTSECONDS=`tail -1 $LOG | cut -f 2`
     LASTEVENT=`tail -1 $LOG | cut -f 1`
-    if [[ $LASTSECONDS == "epoch seconds" ]]; then { # no data in the log yet
+    if [[ $LASTSECONDS == "epoch_seconds" ]]; then { # no data in the log yet
         LASTSECONDS=$SECONDS
         LASTEVENT="NONE"
         LASTDATE="NEVER"
@@ -68,6 +73,7 @@ else {
     # elegant way to declare CYCLE and write the file
     CYCLE=("tcp://127.0.0.1:2375" "")
     printf '%s\n' ${CYCLE[*]} >> $CONFIGFILE
+    printf '\n' >> $CONFIGFILE
     }
 fi
 
@@ -76,8 +82,9 @@ fi
 # for each?
 Y=${#CYCLE[*]}
 for (( X=0 ; $X < $Y ; X++ )) ; do {
-    if [ -z "${CYCLE[$X]}" ] ; then {
-        CYCLE[$X]=BLANK
+    #echo "x is $X val is ${CYCLE[X]}" # debug
+    if [ -z "${CYCLE[X]}" ] ; then {
+        CYCLE[X]=BLANK
         }
     fi
     }
@@ -132,28 +139,16 @@ if [[ ! $MENURETURN ]] ; then {
     # couldn't get ESC to map to q or KEY_LEFT - quite annoying
     }
 fi
-#"<s:1>1 morning" "        song1" "        song2" "        {email assistant}" "<s:a1>        Add Trigger" "<s:2>2 evening" "        song3" "        song4" "        sing5" "<s:a2>        Add Trigger" "" "" "Previous event - `date -d "1970-01-01 UTC 1132835026 seconds"`" -Q "1" -n "" -t "lullibuy (alpha)"
 
 # write a message to STDOUT after each run
-echo -e "\tCheck out http://docker.com"
+#echo -e "\tCheck out http://docker.com"
 
 SELECTINDEX=$(($MENURETURN-1)) # back to 0 based array
 Z=$(( $Z - 1 )) # back to 0 based
 
 if [[ $SELECTINDEX == $(($Z)) ]] ; then {            # configuration selected
-    echo -e "\nActions are in:       $CONFIGFILE (exists)\n"
-    echo -e "Marked actions:       $LOG (exists)\n"
-    echo -e "\nTo run action commands put them in:\n"
-    # there must be a more elegant way to do this
-    for (( X=0 ; $X < $Y ; X++ )) ; do {
-        A="$HOME/.$NAME.${CYCLE[X]}"
-        if [ -f $A ] ; then
-            printf '                      %s\n' "$A (exists)"
-        else
-            printf '                      %s\n' "$A"
-        fi
-        }
-    done
+    echo -e "\nValues are in:       $CONFIGFILE (exists)\n"
+    echo -e "       Logged:       $LOG (exists)\n"
     echo -e
 
     }
