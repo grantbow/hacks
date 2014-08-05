@@ -1,0 +1,208 @@
+#!/bin/bash
+#
+# switchdocker         Script for changing DOCKER_HOST environment variable
+#
+# Author:	Grant Bowman <grantbow@grantbow.com>
+#
+# Version:	
+#           switchdocker  0.1  2014-08-03  grantbow@grantbow.com
+#
+# Package Dependencies: iselect
+#
+# Config Spec:  each line in .switchdocker.conf is used for one DOCKER_HOST value
+#                       tcp://127.0.0.1:2375
+#
+
+set -e
+
+NAME="switchdocker"
+DESC="script for changing between DOCKER_HOST values"
+
+# depends on $HOME
+LOG=$HOME/.$NAME.log
+CONFIGFILE=$HOME/.$NAME.conf
+SECONDS=`date +%s`            # current
+#PIDFILE=/var/run/$NAME.pid   # not used yet
+
+########### * assumes * existence of tail, cut, dc, date
+if ! [[ -x `which iselect` ]] ; then {
+    echo "Please install iselect.";
+    exit 1;
+}
+fi
+
+# no --help yet
+
+# hot keys easy to implement outside the script with numeric or event name parameter
+
+if ! [ -e $LOG ]; then { # missing log
+    touch $LOG ;
+    echo -e "DOCKER_HOST\tepoch seconds\thour of day\tinterval hours\treadable date" >> $LOG
+    LASTSECONDS=$SECONDS
+    LASTEVENT="NONE"
+    LASTDATE="NEVER" # only used for display of iselect
+    #LASTDATE=`date -d "1970-01-01 UTC $LASTSECONDS seconds" `
+    }
+else {                   # log exists, read last event
+    LASTSECONDS=`tail -1 $LOG | cut -f 2`
+    LASTEVENT=`tail -1 $LOG | cut -f 1`
+    if [[ $LASTSECONDS == "epoch seconds" ]]; then { # no data in the log yet
+        LASTSECONDS=$SECONDS
+        LASTEVENT="NONE"
+        LASTDATE="NEVER"
+        }
+    else { # assume log not empty, LASTSECONDS and LASTEVENT are ok
+        LASTDATE=`date -d "1970-01-01 UTC $LASTSECONDS seconds" `
+        }
+    fi
+    }
+fi
+
+
+
+# Read a config file if it is present.
+if [ -r $CONFIGFILE ] ; then {
+    readarray -t CYCLE < $CONFIGFILE # a bash builtin, CYCLE is an indexed array
+    }
+else {
+    # elegant way to declare CYCLE and write the file
+    CYCLE=("tcp://127.0.0.1:2375" "")
+    printf '%s\n' ${CYCLE[*]} >> $CONFIGFILE
+    }
+fi
+
+# check CYCLE values for blank lines
+# change loop is omitted indexes won't cause problems
+# for each?
+Y=${#CYCLE[*]}
+for (( X=0 ; $X < $Y ; X++ )) ; do {
+    if [ -z "${CYCLE[$X]}" ] ; then {
+        CYCLE[$X]=BLANK
+        }
+    fi
+    }
+done
+
+MENUCONTENT=
+INITSELECTION="1" # pre-highlight item, default is first item
+Y=${#CYCLE[*]} # set because there's trouble evaluating directly in the for (())
+# when change loop is omitted indexes won't cause problems # for each?
+for (( X=0 ; $X < $Y ; X++ )) ; do {
+
+    C=${CYCLE[X]} # current event name
+    # construct menu content for iselect
+    Z=$(($X+1)) # +1 convert from zero index
+    MENUCONTENT="$MENUCONTENT<s:$Z>$Z.$C "; # if " " instead of "." 2 params
+
+    #echo "${CYCLE[X]}" # debug
+    #echo "$LASTEVENT" # debug
+
+    if [[ $LASTEVENT = ${CYCLE[X]} ]] ; then { # highlight the next event
+        INITSELECTION=$(( $Z + 1 )) # +1 next value
+        }
+    fi
+
+    if [[ $1 == $C || $1 == $Z ]] ; then { # check for numeric or named event
+        MENURETURN="$Z" # valid parameter passed to script, no need for menu now
+        }
+    fi
+    }
+done
+
+# if INITSELECTION is too high, highlight first event
+if [[ $INITSELECTION -gt $Y ]] ; then {
+    INITSELECTION="1"
+    }
+fi
+
+if [[ $1 && ! $MENURETURN ]] ; then {  # unrecognized value passed to script
+    echo "unrecognized: $1"
+    exit 1
+}
+fi
+
+
+# present menu with configuration & previous event
+#echo "initselection $INITSELECTION" #debug
+#echo "menucontent $MENUCONTENT" #debug
+#sleep 10
+Z=$(( ${#CYCLE[*]} + 1 )) # configuration menu item, Z+1 charts actions
+if [[ ! $MENURETURN ]] ; then {
+    MENURETURN="`iselect $MENUCONTENT \"\" \"<s:$Z>$(($Z)).configuration\" \"<s:$Z+1>$(($Z+1)).cancel\" \"\" \"\" \"Previous event - $LASTEVENT $LASTDATE\" -p $INITSELECTION -n \"\" -kj:KEY_DOWN -kk:KEY_UP -kl:KEY_RIGHT -kSPACE:RETURN -t \"$NAME testing version\"`"
+    # couldn't get ESC to map to q or KEY_LEFT - quite annoying
+    }
+fi
+#"<s:1>1 morning" "        song1" "        song2" "        {email assistant}" "<s:a1>        Add Trigger" "<s:2>2 evening" "        song3" "        song4" "        sing5" "<s:a2>        Add Trigger" "" "" "Previous event - `date -d "1970-01-01 UTC 1132835026 seconds"`" -Q "1" -n "" -t "lullibuy (alpha)"
+
+# write a message to STDOUT after each run
+echo -e "\tCheck out http://docker.com"
+
+SELECTINDEX=$(($MENURETURN-1)) # back to 0 based array
+Z=$(( $Z - 1 )) # back to 0 based
+
+if [[ $SELECTINDEX == $(($Z)) ]] ; then {            # configuration selected
+    echo -e "\nActions are in:       $CONFIGFILE (exists)\n"
+    echo -e "Marked actions:       $LOG (exists)\n"
+    echo -e "\nTo run action commands put them in:\n"
+    # there must be a more elegant way to do this
+    for (( X=0 ; $X < $Y ; X++ )) ; do {
+        A="$HOME/.$NAME.${CYCLE[X]}"
+        if [ -f $A ] ; then
+            printf '                      %s\n' "$A (exists)"
+        else
+            printf '                      %s\n' "$A"
+        fi
+        }
+    done
+    echo -e
+
+    }
+elif [[ $SELECTINDEX -le ${#CYCLE} ]] ; then {
+    # log the event
+    MYHOUR=`date +%k`
+    XMIN=`date +%M`
+    MYMIN=`dc -e " 2 k $XMIN 60 / n "`
+    ndh="${CYCLE[SELECTINDEX]}"
+    if [[ $MYMIN == 0 ]] ; then
+        MYMIN = ".0" # correction for possible dc output
+    fi
+    if [[ $LASTSECONDS == $SECONDS ]] ; then
+        echo -e "$ndh\t$SECONDS\t$MYHOUR$MYMIN\t0.0\t`date`" >> $LOG
+    else
+        echo -e "$ndh\t$SECONDS\t$MYHOUR$MYMIN\t`dc -e \" 2 k $SECONDS $LASTSECONDS - 3600 / n\"`\t`date`" >> $LOG
+    fi
+    
+    echo -e "previous DOCKER_HOST $DOCKER_HOST"
+    echo -e "     new DOCKER_HOST $ndh"
+    if [[ $ndh == "BLANK" ]] ; then
+        export DOCKER_HOST=""
+    else
+        export DOCKER_HOST="$ndh"
+    fi
+
+        # use dc to give the difference between two second values (replace variables):
+        #
+        # 	dc -e " 2 k $SECONDS $LASTSECONDS - 3600 / n"
+        #
+        # use this to give the seconds of any --date (replace string):
+        #
+        # 	date --date="Jun 28 19:38:15 PDT 2003" +%s
+        #
+        # use this to convert epoch seconds back using local time zone (replace 946684800):
+        #
+        # 	date -d '1970-01-01 UTC 946684800 seconds' +"%Y-%m-%d T %T%z"
+        #
+        # use this to create an hour of day value
+        #
+        #       dc -e " 2 k `date +\"%M\"` 60 / n "
+        #
+    }
+else { # iselect shouldn't allow this
+    echo -e "Nothing recorded to .$NAME.log."
+    }
+fi
+
+##### conclude
+
+exit 0
+
