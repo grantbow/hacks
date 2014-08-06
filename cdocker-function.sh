@@ -1,9 +1,7 @@
 #
 # cdocker         function for changing DOCKER_HOST environment variable
-#
-#                        no shell script can change a parent's environment variable
-#                        so this must be a function that manages DOCKER_HOST
-#                        triggered when called/invoked by name
+#                 to use, source this file from $HOME\.bash_profile then
+#                 call/invoke 'cdocker' from your prompt
 #
 # Author:	Grant Bowman <grantbow@grantbow.com>
 #
@@ -12,10 +10,11 @@
 #           cdocker  0.2  2014-08-04  grantbow@grantbow.com - works but not a function yet
 #           cdocker  0.3  2014-08-06  grantbow@grantbow.com - functions use variable space of shell
 #                                                             that's why we are using a function to set a variable
-#                                                             must clean up, no assumptions
-#                                                             "event" is now value of DOCKER_HOST
-#                                                             renamed variables to prevent conflicts
-#                                                             if these vars are used in shell they will be cleared
+#                                                             must clean up our variables, no assumptions
+#                                                             "event" from comments is now value of DOCKER_HOST
+#                                                             changed variable names to prevent conflicts
+#                                                             prepended C because we are "changing" DOCKER_HOST
+#                                                             if these vars are used in shell elsewhere they will be cleared
 #
 # Package Dependencies: iselect
 #
@@ -26,7 +25,7 @@
 function cdocker() {
 
 CNAME="cdocker"
-CDESC="changes between DOCKER_HOST values"
+CDESC="changes the DOCKER_HOST value from .cdocker.conf and logs to .cdocker.log"
 
 # depends on $HOME
 CLOG=$HOME/.$CNAME.log
@@ -47,21 +46,21 @@ fi
 if ! [ -e $CLOG ]; then { # missing log
     touch $CLOG ;
     echo -e "DOCKER_HOST\tepoch_seconds\thour_of_day\tinterval_hours\treadable_date" >> $CLOG
-    LASTSECONDS=$CSECONDS
-    LASTEVENT="NONE"
-    LASTDATE="NEVER" # only used for display of iselect
-    #LASTDATE=`date -d "1970-01-01 UTC $LASTSECONDS seconds" `
+    CLASTSECONDS=$CSECONDS
+    CLASTEVENT="NONE"
+    CLASTDATE="NEVER" # only used for display of iselect
+    #CLASTDATE=`date -d "1970-01-01 UTC $CLASTSECONDS seconds" `
     }
 else {                   # log exists, read last event
-    LASTSECONDS=`tail -1 $CLOG | cut -f 2`
-    LASTEVENT=`tail -1 $CLOG | cut -f 1`
-    if [[ $LASTSECONDS == "epoch_seconds" ]]; then { # no data in the log yet
-        LASTSECONDS=$CSECONDS
-        LASTEVENT="NONE"
-        LASTDATE="NEVER"
+    CLASTSECONDS=`tail -1 $CLOG | cut -f 2`
+    CLASTEVENT=`tail -1 $CLOG | cut -f 1`
+    if [[ $CLASTSECONDS == "epoch_seconds" ]]; then { # no data in the log yet
+        CLASTSECONDS=$CSECONDS
+        CLASTEVENT="NONE"
+        CLASTDATE="NEVER"
         }
-    else { # assume log not empty, LASTSECONDS and LASTEVENT are ok
-        LASTDATE=`date -d "1970-01-01 UTC $LASTSECONDS seconds" `
+    else { # assume log not empty, CLASTSECONDS and CLASTEVENT are ok
+        CLASTDATE=`date -d "1970-01-01 UTC $CLASTSECONDS seconds" `
         }
     fi
     }
@@ -71,24 +70,24 @@ fi
 
 # Read a config file if it is present.
 if [ -r $CCONFIGFILE ] ; then {
-    readarray -t CYCLE < $CCONFIGFILE # a bash builtin, CYCLE is an indexed array
+    readarray -t CCYCLE < $CCONFIGFILE # a bash builtin, CCYCLE is an indexed array
     }
 else {
-    # elegant way to declare CYCLE and write the file
-    CYCLE=("tcp://127.0.0.1:2375" "")
-    printf '%s\n' ${CYCLE[*]} >> $CCONFIGFILE
+    # elegant way to declare CCYCLE and write the file
+    CCYCLE=("tcp://127.0.0.1:2375" "")
+    printf '%s\n' ${CCYCLE[*]} >> $CCONFIGFILE
     printf '\n' >> $CCONFIGFILE
     }
 fi
 
-# check CYCLE values for blank lines
+# check CCYCLE values for blank lines
 # change loop is omitted indexes won't cause problems
 # for each?
-CY=${#CYCLE[*]}
+CY=${#CCYCLE[*]}
 for (( CX=0 ; $CX < $CY ; CX++ )) ; do {
-    #echo "cx is $CX val is ${CYCLE[CX]}" # debug
-    if [ -z "${CYCLE[CX]}" ] ; then {
-        CYCLE[CX]=BLANK
+    #echo "cx is $CX val is ${CCYCLE[CX]}" # debug
+    if [ -z "${CCYCLE[CX]}" ] ; then {
+        CCYCLE[CX]=BLANK
         }
     fi
     }
@@ -96,19 +95,19 @@ done
 
 unset CMENURETURN CMENUCONTENT CSELECTINDEX
 CINITSELECTION="1" # pre-highlight item, default is first item
-CY=${#CYCLE[*]} # set because there's trouble evaluating directly in the for (())
+CY=${#CCYCLE[*]} # set because there's trouble evaluating directly in the for (())
 # when change loop is omitted indexes won't cause problems # for each?
 for (( CX=0 ; $CX < $CY ; CX++ )) ; do {
 
-    CC=${CYCLE[CX]} # current event name
+    CC=${CCYCLE[CX]} # current event name
     # construct menu content for iselect
     CZ=$(($CX+1)) # +1 convert from zero index
     CMENUCONTENT="$CMENUCONTENT<s:$CZ>$CZ.$CC "; # if " " instead of "." 2 params
 
-    #echo "${CYCLE[CX]}" # debug
-    #echo "$LASTEVENT" # debug
+    #echo "${CCYCLE[CX]}" # debug
+    #echo "$CLASTEVENT" # debug
 
-    if [[ $LASTEVENT = ${CYCLE[CX]} ]] ; then { # highlight the next event
+    if [[ $CLASTEVENT = ${CCYCLE[CX]} ]] ; then { # highlight the next event
         CINITSELECTION=$(( $CZ + 1 )) # +1 next value
         }
     fi
@@ -131,10 +130,10 @@ fi
 #echo "cmenucontent $CMENUCONTENT" #debug
 #echo "cmenureturn $CMENURETURN" #debug
 #sleep 10
-CZ=$(( ${#CYCLE[*]} + 1 )) # zero to one based, configuration menu item
+CZ=$(( ${#CCYCLE[*]} + 1 )) # zero to one based, configuration menu item
 CT=$(( $CZ + 1 ))
 if [[ ! $CMENURETURN ]] ; then {
-    CMENURETURN="`iselect $CMENUCONTENT \"\" \"<s:$CZ>$(($CZ)).configuration\" \"<s:$CT>$(($CT)).cancel\" \"\" \"\" \"Previous event - $LASTEVENT $LASTDATE\" -p $CINITSELECTION -n \"\" -kj:KEY_DOWN -kk:KEY_UP -kl:KEY_RIGHT -kSPACE:RETURN -t \"$CNAME testing version\"`"
+    CMENURETURN="`iselect $CMENUCONTENT \"\" \"<s:$CZ>$(($CZ)).configuration\" \"<s:$CT>$(($CT)).cancel\" \"\" \"Previous event - $CLASTEVENT $CLASTDATE\" \"\" \"This menu $CDESC\" -p $CINITSELECTION -n \"\" -kj:KEY_DOWN -kk:KEY_UP -kl:KEY_RIGHT -kSPACE:RETURN -t \"$CNAME testing version\"`"
     # couldn't get ESC to map to q or KEY_LEFT - quite annoying
     }
 fi
@@ -152,19 +151,19 @@ if [[ $CSELECTINDEX == $(($CZ)) ]] ; then {            # configuration selected
     echo -e
 
     }
-elif [[ $CSELECTINDEX -le ${#CYCLE} ]] ; then {
+elif [[ $CSELECTINDEX -le ${#CCYCLE} ]] ; then {
     # log the event
     CMYHOUR=`date +%k`
     CXMIN=`date +%M`
     CMYMIN=`dc -e " 2 k $CXMIN 60 / n "`
-    CNEWDOCKERHOST="${CYCLE[CSELECTINDEX]}"
+    CNEWDOCKERHOST="${CCYCLE[CSELECTINDEX]}"
     if [[ $CMYMIN == 0 ]] ; then
-        CMYMIN = ".0" # correction for possible dc output
+        CMYMIN=".0" # correction for possible dc output
     fi
-    if [[ $LASTSECONDS == $CSECONDS ]] ; then
+    if [[ $CLASTSECONDS == $CSECONDS ]] ; then
         echo -e "$CNEWDOCKERHOST\t$CSECONDS\t$CMYHOUR$CMYMIN\t0.0\t`date`" >> $CLOG
     else
-        echo -e "$CNEWDOCKERHOST\t$CSECONDS\t$CMYHOUR$CMYMIN\t`dc -e \" 2 k $CSECONDS $LASTSECONDS - 3600 / n\"`\t`date`" >> $CLOG
+        echo -e "$CNEWDOCKERHOST\t$CSECONDS\t$CMYHOUR$CMYMIN\t`dc -e \" 2 k $CSECONDS $CLASTSECONDS - 3600 / n\"`\t`date`" >> $CLOG
     fi
     
     echo -e "previous DOCKER_HOST $DOCKER_HOST"
@@ -177,7 +176,7 @@ elif [[ $CSELECTINDEX -le ${#CYCLE} ]] ; then {
 
         # use dc to give the difference between two second values (replace variables):
         #
-        # 	dc -e " 2 k $SECONDS $LASTSECONDS - 3600 / n"
+        # 	dc -e " 2 k $SECONDS $CLASTSECONDS - 3600 / n"
         #
         # use this to give the seconds of any --date (replace string):
         #
@@ -198,7 +197,7 @@ else { # iselect shouldn't allow this
 fi
 
 ##### conclude
-unset CNAME CDESC CLOG CCONFIGFILE CSECONDS LASTSECONDS LASTEVENT LASTDATE CYCLE CMENUCONTENT CINITSELECTION CX CY CMENURETURN CSELECTINDEX CZ CT CMYHOUR CXMIN CMYMIN CNEWDOCKERHOST
+unset CNAME CDESC CLOG CCONFIGFILE CSECONDS CLASTSECONDS CLASTEVENT CLASTDATE CCYCLE CMENUCONTENT CINITSELECTION CX CY CMENURETURN CSELECTINDEX CZ CT CMYHOUR CXMIN CMYMIN CNEWDOCKERHOST
 
 }
 
