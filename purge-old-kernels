@@ -9,7 +9,7 @@
 # runs apt-get purge on old linux-image packages and their headers
 # This script could easily be modified for other systems
 # however it has only been tested on Ubuntu 9.10 Karmic Koala
-# Information about other systems would be most appreicated.
+# Information about other systems would be most appreciated.
 
 kernels=`dpkg -l | egrep ^ii.*linux-image-\[23\] | cut --d=" " --fields=3 | cut --d="-" --fields=3-4`
 anyprocessed=0
@@ -21,12 +21,17 @@ fi
 for kernel in $kernels ; do
     if [[ ( $kernel-generic != `uname -r` ) && ( $kernel-generic < `uname -r` ) ]] ; then
         # don't offer to remove the currently running or newer  kernels
+        echo ' ***** Do you want to run the following command? [Y/n] *****';
         anyprocessed=1
-        echo -e " ***** Do you want to run the following command? [Y/n] \n apt-get purge linux-image-$kernel-generic linux-headers-$kernel linux-headers-$kernel-generic \n *****";
-        $L = `line`;
-        if [ $L == "y" ] || [ $L == "" ] ; then
-            echo "apt-get purge linux-image-$kernel-generic linux-headers-$kernel linux-headers-$kernel-generic";
-        fi
+        while true; do
+            read -s -N 1 -p "     apt-get purge linux-image-$kernel-generic linux-headers-$kernel linux-headers-$kernel-generic" yn ;
+            case $yn in
+                [Yy]* ) printf "\n\n"; echo "apt-get purge linux-image-$kernel-generic linux-headers-$kernel linux-headers-$kernel-generic"; printf "\n";;
+                [Nn]* ) break;;
+                * ) echo "Please answer yes or no.";;
+            esac
+        done
+        printf "\n";
     fi
 done
 
@@ -34,6 +39,7 @@ if ! (( $anyprocessed )) ; then
     echo "No old kernels found.";
 fi
 
+printf "\n";
 
 # takes care of kernels? via comments from http://www.omgubuntu.co.uk/2011/07/kernel-entries-gone/
 #
