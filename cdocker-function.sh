@@ -6,7 +6,10 @@
 #           logs to ~/.cdocker.log
 #           optional parameter to auto-select
 #
-# Author:	Grant Bowman <grantbow@grantbow.com>
+# Author:   Grant Bowman <grantbow@grantbow.com>
+#     (c)   2014
+#
+# License:
 #
 # Version:	
 #           cdocker  0.1  2014-08-03  grantbow@grantbow.com
@@ -20,7 +23,7 @@
 #                                                             if these vars are used in shell elsewhere they will be cleared
 #           cdocker  0.4  2014-08-10  grantbow@grantbow.com - now works with or without iselect
 #
-# Package Dependencies: iselect
+# Optional Package Dependency: iselect
 #
 # Config Spec: each line in .cdocker.conf is used for one DOCKER_HOST value
 #                       tcp://127.0.0.1:2375
