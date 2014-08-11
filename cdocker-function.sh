@@ -18,6 +18,7 @@
 #                                                             changed variable names to prevent conflicts
 #                                                             prepended C because we are "changing" DOCKER_HOST
 #                                                             if these vars are used in shell elsewhere they will be cleared
+#           cdocker  0.4  2014-08-10  grantbow@grantbow.com - now works with or without iselect
 #
 # Package Dependencies: iselect
 #
@@ -42,11 +43,10 @@ CSECONDS=`date +%s`            # current
 #PIDFILE=/var/run/$CNAME.pid   # not used yet
 
 ########### * assumes * existence of tail, cut, dc, date
-if ! [[ -x `which iselect` ]] ; then {
-    echo "Please install iselect.";
-    }
-elif [[ $1 == "--help" ]] ; then {
-    echo "$CNAME $CINVOKE $CDESC";
+
+if [[ $1 == "--help" ]] ; then {
+    echo -e "usage: $CNAME $CINVOKE\n"
+    echo -e "description: $CDESC\n";
     }
 else {
 
@@ -99,7 +99,7 @@ else {
         }
     done
     
-    unset CMENURETURN CMENUCONTENT CSELECTINDEX
+    unset CMENURETURN CMENUCONTENT CSELECTINDEX CTEXTMENUCONTENT
     CINITSELECTION="1" # pre-highlight item, default is first item
     CY=${#CCYCLE[*]} # set because there's trouble evaluating directly in the for (())
     # when change loop is omitted indexes won't cause problems # for each?
@@ -109,6 +109,7 @@ else {
         # construct menu content for iselect
         CZ=$(($CX+1)) # +1 convert from zero index
         CMENUCONTENT="$CMENUCONTENT<s:$CZ>$CZ.$CC "; # if " " instead of "." 2 params
+        CTEXTMENUCONTENT="$CTEXTMENUCONTENT$CC "; # if " " instead of "." 2 params
     
         #echo "${CCYCLE[CX]}" # debug
         #echo "$CLASTEVENT" # debug
@@ -138,11 +139,24 @@ else {
     #sleep 10
     CZ=$(( ${#CCYCLE[*]} + 1 )) # zero to one based, configuration menu item
     CT=$(( $CZ + 1 ))
-    if [[ ! $CMENURETURN ]] ; then {
-        CMENURETURN="`iselect $CMENUCONTENT \"\" \"<s:$CZ>$(($CZ)).configuration\" \"<s:$CT>$(($CT)).cancel\" \"\" \"Previous event - $CLASTEVENT $CLASTDATE\" \"\" \"$CNAME $CINVOKE $CDESC\" -p $CINITSELECTION -n \"\" -kj:KEY_DOWN -kk:KEY_UP -kl:KEY_RIGHT -kSPACE:RETURN -t \"$CNAME testing version\"`"
+    if [[ -x `which iselect` && ! $CMENURETURN ]] ; then {
+        CMENURETURN="`iselect $CMENUCONTENT \"\" \"<s:$CZ>$(($CZ)).configuration\" \"<s:$CT>$(($CT)).cancel\" \"\" \"Previous event: $CLASTEVENT $CLASTDATE\" \"\" \"usage: $CNAME $CINVOKEi\" \"description: $CDESC\" \"\" \"Present DOCKER_HOST $DOCKER_HOST\" -p $CINITSELECTION -n \"\" -kj:KEY_DOWN -kk:KEY_UP -kl:KEY_RIGHT -kSPACE:RETURN -t \"$CNAME testing version\"`"
         # couldn't get ESC to map to q or KEY_LEFT - quite annoying
         }
+    else {
+        #echo "Please install iselect for a better experience."
+        echo -e
+        echo -e "present DOCKER_HOST $DOCKER_HOST\n"
+        echo -e "Next: $CINITSELECTION\n"
+        echo "Please enter choice:"
+        COPTIONS="$CTEXTMENUCONTENT configuration cancel"
+        select COPT in $COPTIONS; do
+            CMENURETURN="$REPLY"
+            break
+        done
+        }
     fi
+    echo -e
     
     # write a message to STDOUT after each run
     #echo -e "\tCheck out http://docker.com"
@@ -151,8 +165,13 @@ else {
     CSELECTINDEX=$(($CMENURETURN-1)) # back to 0 based array
     CZ=$(( $CZ - 1 )) # back to 0 based
     
-    if [[ $CSELECTINDEX == $(($CZ)) ]] ; then {            # configuration selected
-        echo -e "\nValues are in:       $CCONFIGFILE (exists)\n"
+    if [[ $CSELECTINDEX == $(($CZ+1)) ]] ; then {          #        cancel selected
+        echo -e
+        }
+    elif [[ $CSELECTINDEX == $(($CZ)) ]] ; then {          # configuration selected
+        echo -e "        usage: $CNAME $CINVOKE \n"
+        echo -e "  description: $CDESC\n"
+        echo -e "Values are in:       $CCONFIGFILE (exists)\n"
         echo -e "       Logged:       $CLOG (exists)\n"
         echo -e
     
@@ -203,7 +222,7 @@ else {
     fi
     
     ##### conclude
-    unset CNAME CINVOKE CDESC CLOG CCONFIGFILE CSECONDS CLASTSECONDS CLASTEVENT CLASTDATE CCYCLE CMENUCONTENT CINITSELECTION CX CY CMENURETURN CSELECTINDEX CZ CT CMYHOUR CXMIN CMYMIN CNEWDOCKERHOST
+    unset CNAME CINVOKE CDESC CLOG CCONFIGFILE CSECONDS CLASTSECONDS CLASTEVENT CLASTDATE CCYCLE CMENUCONTENT CINITSELECTION CX CY CMENURETURN CSELECTINDEX CZ CT CMYHOUR CXMIN CMYMIN CNEWDOCKERHOST CTEXTMENUCONTENT COPTIONS REPLY
     }
 fi
 }
