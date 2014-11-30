@@ -1,0 +1,2 @@
+#!/bin/bash
+a=0 ; tail -f $1 | while read -r line ; do ((a++)) ; echo -ne "\r$a" ; done
