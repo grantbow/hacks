@@ -1,0 +1,14 @@
+Ubuntu Bionic Notes
+
+20180114
+lvm the first time was OK in virtualbox.
+after troubles I tried to reinstall quickly. grub-install failed so I fell back to ext4
+
+after installing some packages, one of them prevented gdm from starting up.
+it might have been that vmware proprietary driver.
+so I quickly reinstalled again, bummer!
+
+This time seems ok. both monitors are recognized.
+My upgraded 16.04 machine isn't so lucky. I would like to compare them soon.
+This freshly installed 18.04 pre-release is doing well so far.
+
