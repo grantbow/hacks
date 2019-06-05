@@ -1,0 +1,9 @@
+set nocompatible
+set number
+set hlsearch
+set ignorecase
+set incsearch
+set ruler
+set cmdheight=3
+set laststatus=2
+
