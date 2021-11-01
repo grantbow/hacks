@@ -6,4 +6,7 @@ set incsearch
 set ruler
 set cmdheight=3
 set laststatus=2
-
+set expandtab
+set smarttab
+set shiftwidth=4
+set tabstop=4
