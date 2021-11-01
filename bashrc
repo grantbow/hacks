@@ -153,6 +153,8 @@ export XDG_CONFIG_HOME=$HOME/Projects
 
 #%sudo ALL=(ALL) NOPASSWD: ALL
 
+#lighten blue color in xterm...Preferences...Colors...Color palette
+
 # lxde dclock settings in .config/lxpanel/LXDE/panels/panel
 # ClockFmt=%Y%m%d %a %R
 # TooltipFmt=%x %A
